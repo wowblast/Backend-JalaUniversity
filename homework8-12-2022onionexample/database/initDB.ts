@@ -7,7 +7,7 @@ import UserRepository from './repository';
 
 class Test {
     async iniatializeDb(){
-        await AppDataSource.initialize();
+        //await AppDataSource.initialize();
         const user = new UserDB();
         user.lastName = "smith"
         user.name = "jhon"

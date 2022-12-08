@@ -14,4 +14,21 @@ export default class UserService{
     async GetById(id: number): Promise<User> {
         return  await this.userRepository.GetById(id);
     }
+
+    async CreateUser(user: User): Promise<User> {
+       
+        return await this.CreateUser(user);
+    }
+
+    async UpdateUser(user: User): Promise<User> {
+       
+        return await this.UpdateUser(user)
+    }
+    async DeleteUser(id: number){
+        
+         await this.DeleteUser(id)
+    }    
+
+   
+    
 }
