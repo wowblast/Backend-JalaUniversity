@@ -19,7 +19,6 @@ export default class UserRepository implements IUserRepository {
         const savedUser = await repository.save(user);
 
         await AppDataSource.destroy()
-        console.log("creado", savedUser)
         
         return savedUser
     }
@@ -39,13 +38,11 @@ export default class UserRepository implements IUserRepository {
             id: id
         })
         await AppDataSource.destroy()
-        console.log(user)
         return user.affected >0 ? id: null
     }    
 
     async GetById(id: number): Promise<User> {
         await AppDataSource.initialize();
-        console.log("numero a buscar "+ id)
         const repository = AppDataSource.getRepository(UserDB)
         const user = await repository.findOneBy({
             id: id

@@ -1,1 +1,2 @@
-export const USER = 'USER';
+export const USERREPO = 'USERREPO';
+export const USERSERVICE = 'USERSERVICE';

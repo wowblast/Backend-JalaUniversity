@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 import { container } from './repository/inversely.config'
-import { USER } from './repository/types';
-import { IUserRepository } from './repository/user-repository';
+import { USERSERVICE } from './repository/types';
 import User from './entities/user';
+import { IuserService } from './services/Iuser-service';
 
 
-const userService = container.get<IUserRepository>(USER)
+const userService = container.get<IuserService>(USERSERVICE)
 
 
 class Test {
@@ -14,13 +14,13 @@ class Test {
 
         newUser.name= "mitch"
         newUser.lastName =" zambrana"
-        console.log(await userService.CreateUser(newUser) )
+        console.log("created",await userService.CreateNewUser(newUser) )
         
-        const user5 = await userService.GetById(1)
-        console.log(user5)
+        const user5 = await userService.GetUserByID(1)
+        console.log("read id 1 ",user5)
         user5.name = "hh"
-        console.log(await userService.UpdateUser(user5))
-        console.log(await userService.DeleteUser(10))
+        console.log("update id 1",await userService.UpdateOneUser(user5))
+        console.log("delete id 12 ",await userService.DeleteOneUser(12))
         
 
     }

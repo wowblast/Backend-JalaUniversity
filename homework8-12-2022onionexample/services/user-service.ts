@@ -1,34 +1,38 @@
-import { inject } from "inversify";
+import { inject, injectable } from 'inversify';
 import User from "../entities/user";
-import { USER } from '../repository/types';
+import { USERREPO } from '../repository/types';
 import { IUserRepository } from "../repository/user-repository";
+import { IuserService } from './Iuser-service';
 
-export default class UserService{
+@injectable()
+export default class UserService implements IuserService{
     private userRepository: IUserRepository
 
-    constructor(@inject(USER) userRepository: IUserRepository ){
+    constructor(@inject(USERREPO) userRepository: IUserRepository ){
         this.userRepository = userRepository
 
     }
 
-    async GetById(id: number): Promise<User> {
+    async GetUserByID(id: number): Promise<User> {
         return  await this.userRepository.GetById(id);
     }
 
-    async CreateUser(user: User): Promise<User> {
+    async CreateNewUser(user: User): Promise<User> {
        
-        return await this.CreateUser(user);
+        return await this.userRepository.CreateUser(user);
     }
 
-    async UpdateUser(user: User): Promise<User> {
+    async UpdateOneUser(user: User): Promise<User> {
        
-        return await this.UpdateUser(user)
+        return await this.userRepository.UpdateUser(user)
     }
-    async DeleteUser(id: number){
+    async DeleteOneUser(id: number){
         
-         await this.DeleteUser(id)
+        return  await this.userRepository.DeleteUser(id)
     }    
 
    
     
 }
+
+
