@@ -6,16 +6,16 @@ export default class Position {
         this.xPosition = xPosition
         this.yPosition = yPosition
     }
-    public getYPosition(): number {
+    getYPosition(): number {
         return this.yPosition
     }
-    public setYPosition(yPosition: number) {
+    setYPosition(yPosition: number) {
         this.yPosition = yPosition
     }
-    public getXPosition(): number {
+    getXPosition(): number {
         return this.xPosition
     }
-    public setXPosition(xPosition: number) {
+    setXPosition(xPosition: number) {
         this.xPosition = xPosition
     }
 

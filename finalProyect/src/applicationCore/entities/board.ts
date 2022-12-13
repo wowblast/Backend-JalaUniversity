@@ -1,9 +1,9 @@
 export default class Board {
-  private size: number
-    constructor(size: number) {
-      this.size = size
+  private boardSize: number
+    constructor(boardSize: number) {
+      this.boardSize = boardSize
     }
-  getSize(): number {
-    return this.size
+  getBoardSize(): number {
+    return this.boardSize
   }
 }

@@ -1,5 +1,4 @@
-import { IBoardService } from '../coreInterfaces/IBoardService';
-export default class BoardService implements IBoardService {
+export default class BoardPosition implements IBoardService {
     CreateBoard(size: number): void {
         let  board = []
         for(let x = 0; x< size; x++) {

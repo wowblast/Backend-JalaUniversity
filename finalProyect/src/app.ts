@@ -1,9 +1,9 @@
-import BoardService from './applicationCore/coreServices/boardService';
+import BoardService from './applicationCore/coreServices/boardPositionservice';
 console.log("hello")
  import getLinearCongruentialGenerator from './applicationCore/utils/generateRandom'
 
 const ser = new BoardService()
-ser.CreateBoard(5)
+ser.CreateBoard(3)
 
 const second = new Date().getSeconds()
 const minute = new Date().getMinutes()

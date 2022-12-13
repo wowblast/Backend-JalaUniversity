@@ -1,7 +1,8 @@
 import { Status } from '../types.ts/types';
-export interface IBoardService {
-    CreateGame(): void
+export interface IGameService {
+    StartGame(size: number): void
     GetGameStatus(): Status
-    EndGame(): void
-    RestartGame(): void
+    SetGameStatus(status :Status): void
+    EndGame(): Status
+    RestartGame(): Status
 }
