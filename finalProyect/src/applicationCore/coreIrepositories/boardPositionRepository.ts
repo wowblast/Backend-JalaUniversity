@@ -1,10 +1,8 @@
-import BoardPosition from '../entities/boardPosition';
+import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
 import { PositionType } from '../types.ts/types';
 
 export interface IBoardPositionRepository {
-    CreateBoard(size: number):BoardPosition[]
-    MoveSnakeForwars(id: number): BoardPosition
-    GetAllPositions(): BoardPosition[]
-    ClearBoard(): BoardPosition[]
-    CreateSnakePlayer(id: number, xPostion: number, yPostion: number, positionType:PositionType): BoardPosition    
+    CreateBoard(size: number):Promise<void>
+    GetAllPositions(): Promise<GameBoardPositionEntity[]>
+    ClearBoard(): Promise<GameBoardPositionEntity[]>
 }

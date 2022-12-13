@@ -1,8 +1,8 @@
-import SnakePlayer from '../entities/gameBoardPositionEntity';
 import { PositionType } from '../types.ts/types';
+import SnakePlayerEntity from '../entities/snakePlayerEntity';
 export interface ISnakePlayerService {
-    CreateSnakePlayer(id: number, xPostion: number, yPostion: number, positionType:PositionType): SnakePlayer    
+    CreateSnakePlayer(id: number, xPostion: number, yPostion: number, positionType:PositionType): SnakePlayerEntity    
     //GetS(id: number): [SnakePlayer]
-    ChangeSnakePlayerDirecction(id: number): SnakePlayer
+    ChangeSnakePlayerDirecction(id: number): SnakePlayerEntity
     
 }

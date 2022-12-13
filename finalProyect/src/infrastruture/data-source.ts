@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import BoardPosition from './entities/boardPosition';
+import BoardPosition from './entities/gameBoardPosition';
 import SnakePlayer from './entities/snakePlayer';
 import Game from './entities/game';
 
