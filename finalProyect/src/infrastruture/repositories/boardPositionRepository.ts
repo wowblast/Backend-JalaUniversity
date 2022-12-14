@@ -1,8 +1,10 @@
+import { injectable } from 'inversify';
 import { IBoardPositionRepository } from '../../applicationCore/coreIrepositories/boardPositionRepository';
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
-import { PositionType } from '../../applicationCore/types.ts/types';
 import { AppDataSource } from '../data-source';
 import BoardPosition from '../entities/gameBoardPosition';
+import GameBoardPositionMapper from '../mappers/gameBoardPositionMapper';
+@injectable()
 export default class BoardPositionRepository implements IBoardPositionRepository {
     async CreateBoard(size: number): Promise<void> {
         await AppDataSource.initialize();
@@ -26,13 +28,14 @@ export default class BoardPositionRepository implements IBoardPositionRepository
         await AppDataSource.initialize();
         const repository = AppDataSource.getRepository(BoardPosition)
         const points =await repository.find()
-        console.log(points)
-        await AppDataSource.destroy()        
+        await AppDataSource.destroy()     
+        const gameBoardPosition:GameBoardPositionEntity[]  = points.map(GameBoardPositionMapper.castToDomainEntitiy)
 
 
-        return []
+        return gameBoardPosition
     }
     async ClearBoard(): Promise<GameBoardPositionEntity[]> {
+        //await repository.query(`TRUNCATE ${entity.tableName} RESTART IDENTITY CASCADE;`);
         return
     }    
 }

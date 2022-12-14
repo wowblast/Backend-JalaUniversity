@@ -1,11 +1,28 @@
-export default class BoardPosition implements IBoardService {
-    CreateBoard(size: number): void {
-        let  board = []
-        for(let x = 0; x< size; x++) {
-            for(let y = 0; y< size; y++) {
-                board.push({x,y, "filled":"empty", "IdPlayer": 0})
-            }
-        }
-        console.log(board)
+import { inject, injectable } from "inversify";
+import { IBoardPositionService } from "../coreInterfaces/IBoardPositionService";
+import { BoardPositionReposioryID } from '../types.ts/inversifyTypes';
+import { IBoardPositionRepository } from '../coreIrepositories/boardPositionRepository';
+import GameBoardPositionEntity from "../entities/gameBoardPositionEntity";
+
+@injectable()
+export default class BoardPosition implements IBoardPositionService {
+
+   private boardPositionRepository: IBoardPositionRepository
+    constructor(@inject(BoardPositionReposioryID) boardPositionRepository: IBoardPositionRepository ){
+        this.boardPositionRepository = boardPositionRepository
+
+    }
+
+    async GetAllPositions(): Promise<GameBoardPositionEntity[]> {
+        return  await this.boardPositionRepository.GetAllPositions()
+
+    }
+    async ClearBoard(): Promise<GameBoardPositionEntity[]> {
+        return await this.boardPositionRepository.ClearBoard()
+
+    }
+    async CreateBoard(size: number):Promise<void> {
+        return await this.boardPositionRepository.CreateBoard(size)
+
     }
 }

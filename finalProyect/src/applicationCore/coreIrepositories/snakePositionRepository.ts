@@ -6,5 +6,5 @@ export interface ISnakePositionRepository {
     GetSnakePositions(id: number): Promise<GameBoardPositionEntity[]>
     RemoveSnake(): Promise<void>
     StartAutoMovemenvent(): Promise<void>
-    CreateSnakePlayer(snakePlayerEntity: SnakePlayerEntity): GameBoardPositionEntity
+    CreateSnakePlayer(snakePlayerEntity: SnakePlayerEntity,  size: number): Promise<GameBoardPositionEntity>
 }

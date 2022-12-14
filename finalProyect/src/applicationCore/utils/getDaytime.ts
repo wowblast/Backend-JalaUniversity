@@ -1,7 +1,7 @@
-export function GetMinutesDay(){
+export function GetMinutesOfToday(){
     return new Date().getMinutes()
 }
 
-export function GetDaySecondsDay(){
+export function GetDaySecondsOfToday(){
     return new Date().getSeconds()
 }
