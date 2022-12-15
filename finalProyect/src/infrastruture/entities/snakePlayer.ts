@@ -6,10 +6,13 @@ export default class SnakePlayer {
     playerId!: number
     
     @Column()
-    size: number
+    name: string
 
     @Column()
-    direction: string
+    snakeSize: number
+
+    @Column()
+    snakeDirection: string
 
     @Column()
     score: number

@@ -21,9 +21,8 @@ export default class BoardPositionService implements IBoardPositionService {
         await this.boardPositionRepository.ClearBoard()
 
     }
-    async CreateBoard(size: number):Promise<GameBoardPositionEntity[]> {
-        console.log("service")
-        return await this.boardPositionRepository.CreateBoard(size)
+    async CreateBoard(boardSize: number):Promise<GameBoardPositionEntity[]> {
+        return await this.boardPositionRepository.CreateBoard(boardSize)
 
     }
 }

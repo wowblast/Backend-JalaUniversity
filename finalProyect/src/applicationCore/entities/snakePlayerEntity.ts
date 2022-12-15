@@ -1,15 +1,17 @@
-import { Direction } from "../types.ts/types"
+import { SnakeDirection } from '../types.ts/types';
 
 export default class SnakePlayerEntity {
     private playerId: number
     private name: string
-    private direction: Direction
+    private snakeDirection: SnakeDirection
     private score: number
-    constructor(playerId: number, name: string, direction: Direction, score: number      ) {
+    private snakeSize: number
+    constructor(playerId: number, name: string, snakeDirection: SnakeDirection, score: number, snakeSize: number) {
         this.playerId = playerId
         this.name = name
-        this.direction = direction
+        this.snakeDirection = snakeDirection
         this.score = score
+        this.snakeSize = snakeSize
     }
     getPLayerId(): number {
         return this.playerId
@@ -24,8 +26,12 @@ export default class SnakePlayerEntity {
         this.name = name
     }
 
-    getDirection(): Direction {
-        return this.direction
+    getSnakeDirection(): SnakeDirection {
+        return this.snakeDirection
+    }
+
+    setSnakeDirection(snakeDirection: SnakeDirection) {
+        this.snakeDirection = snakeDirection
     }
 
     getScore(): number {
@@ -34,6 +40,14 @@ export default class SnakePlayerEntity {
 
     setScore(score: number) {
         this.score = score
+    }
+
+    getSnakeSize(): number {
+        return this.snakeSize
+    }
+
+    setSnakeSize(snakeSize: number) {
+        this.snakeSize = snakeSize
     }
 
 }

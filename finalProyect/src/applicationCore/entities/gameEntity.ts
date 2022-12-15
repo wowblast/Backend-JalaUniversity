@@ -1,22 +1,31 @@
-import { Status } from '../types.ts/types';
+import {  GameStatus } from '../types.ts/types';
 import Board from './board';
 export default class GameEntity extends Board{    
-    private status: Status
+    private gameStatus: GameStatus
     private stepIntervalBySeconds: number
+    private id: number
     constructor(
-        status: Status, stepIntervalBySeconds: number,size: number
+        id: number, gameStatus: GameStatus, stepIntervalBySeconds: number, boardSize: number
       ) {
-        super(size)
+        super(boardSize)
+        this.id = id
         this.stepIntervalBySeconds = stepIntervalBySeconds
-        this.status = status
+        this.gameStatus = gameStatus
       }
 
-    getStatus() {
-        return this.status
+    getId(): number {
+      return this.id
+    }
+
+    setId(id: number) {
+      this.id = id
+    }
+      getStatus() {
+        return this.gameStatus
     }  
 
-    setStatus(status: Status) {
-        this.status = status
+    setStatus(gameStatus: GameStatus) {
+        this.gameStatus = gameStatus
     }
 
     getStepIntervalBySeconds() {

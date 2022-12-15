@@ -1,18 +1,16 @@
-import { PositionType } from '../types.ts/types';
+import { BoardPositionType } from '../types.ts/types';
 import Position from './position';
 export default class BoardPosition extends Position { 
-  private positionType: PositionType
-  constructor(positionType: PositionType, xPosition: number, yPosition: number) {
-        super(xPosition,yPosition);
-        this.positionType = positionType
+  private boardPositionType: BoardPositionType
+  constructor(boardPositionType: BoardPositionType, xPosition: number, yPosition: number) {
+        super(xPosition, yPosition);
+        this.boardPositionType = boardPositionType
     }
-  getPositionType(): PositionType {
-    return this.positionType
+  getBoardPositionType(): BoardPositionType {
+    return this.boardPositionType
   }
 
-  setPositionType(positionType: PositionType) {    
-    this.positionType = positionType
-  }
-
-  
+  setBoardPositionType(boardPositionType: BoardPositionType) {    
+    this.boardPositionType = boardPositionType
+  }  
 }

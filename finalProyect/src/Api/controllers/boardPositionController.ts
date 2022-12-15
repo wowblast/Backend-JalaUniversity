@@ -19,7 +19,7 @@ export const  getBoardPositions = async  (req, res) => {
 
 export const createBoard = async  (req, res) => {
     try {   
-        const newBoard: GameBoardPositionEntity[] = await boardPositionService.CreateBoard(req.body.size)   
+        const newBoard: GameBoardPositionEntity[] = await boardPositionService.CreateBoard(req.body.boardSize)   
         res.json({newBoard})
     }
     catch (err) {

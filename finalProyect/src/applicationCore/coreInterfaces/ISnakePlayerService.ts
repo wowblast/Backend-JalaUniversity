@@ -1,8 +1,5 @@
-import { PositionType } from '../types.ts/types';
 import SnakePlayerEntity from '../entities/snakePlayerEntity';
 export interface ISnakePlayerService {
-    CreateSnakePlayer(id: number, xPostion: number, yPostion: number, positionType:PositionType): SnakePlayerEntity    
-    //GetS(id: number): [SnakePlayer]
-    ChangeSnakePlayerDirecction(id: number): SnakePlayerEntity
-    
+    CreateSnakePlayer(playerId: number): Promise<SnakePlayerEntity>
+    ChangeSnakePlayerDirecction(playerId: number): Promise<SnakePlayerEntity>    
 }

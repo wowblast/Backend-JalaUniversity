@@ -1,9 +1,9 @@
-import { Status } from '../types.ts/types';
+import { GameStatus } from '../types.ts/types';
 import GameEntity from '../entities/gameEntity';
 export interface IGameService {
-    StartGame(size: number): GameEntity
-    GetGameStatus(): Status
-    SetGameStatus(status :Status): void
-    EndGame(): Status
-    RestartGame(): Status
+    StartGame(boardSize: number): GameEntity
+    GetGameStatus(): GameStatus
+    SetGameStatus(gameStatus :GameStatus): void
+    EndGame(): GameStatus
+    RestartGame(): GameStatus
 }
