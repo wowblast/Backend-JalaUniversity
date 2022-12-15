@@ -1,27 +1,39 @@
 import 'reflect-metadata'
 import { container } from '../../applicationCore/config/inversify.config'
-import { IBoardPositionService } from '../../applicationCore/coreInterfaces/IBoardPositionService';
-import { BoardPositionReposioryID } from '../../applicationCore/types.ts/inversifyTypes';
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
+import BoardPositionService from '../../applicationCore/coreServices/boardPositionService';
 
 
 
-const boardPositionService = container.get<IBoardPositionService>(BoardPositionReposioryID)
+const boardPositionService = container.resolve<BoardPositionService>(BoardPositionService)
 
 export const  getBoardPositions = async  (req, res) => {
-		try {
-			//const id = req.params.id
-            //boardPositionService.GetAllPositions()
-			const product = 4//await getProduct(id)
+		try {			
             const allPositions: GameBoardPositionEntity[] = await boardPositionService.GetAllPositions()
-            console.log("lsita" )
 			res.json(allPositions)
-            //res.json({"allPositions": 50})
-
 		}
 		catch (err) {
 		res.status(500).send(err)
 		}
 	}
 
-//app/cont
+export const createBoard = async  (req, res) => {
+    try {   
+        const newBoard: GameBoardPositionEntity[] = await boardPositionService.CreateBoard(req.body.size)   
+        res.json({newBoard})
+    }
+    catch (err) {
+    res.status(500).send(err)
+    }
+}
+
+export const clearBoard = async  (req, res) => {
+    try {   
+        await boardPositionService.ClearBoard()
+        res.json({"cleared": "true"})
+    }
+    catch (err) {
+    res.status(500).send(err)
+    }
+}
+

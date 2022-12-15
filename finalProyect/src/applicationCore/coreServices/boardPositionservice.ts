@@ -5,7 +5,7 @@ import { IBoardPositionRepository } from '../coreIrepositories/boardPositionRepo
 import GameBoardPositionEntity from "../entities/gameBoardPositionEntity";
 
 @injectable()
-export default class BoardPosition implements IBoardPositionService {
+export default class BoardPositionService implements IBoardPositionService {
 
    private boardPositionRepository: IBoardPositionRepository
     constructor(@inject(BoardPositionReposioryID) boardPositionRepository: IBoardPositionRepository ){
@@ -17,11 +17,12 @@ export default class BoardPosition implements IBoardPositionService {
         return  await this.boardPositionRepository.GetAllPositions()
 
     }
-    async ClearBoard(): Promise<GameBoardPositionEntity[]> {
-        return await this.boardPositionRepository.ClearBoard()
+    async ClearBoard(): Promise<void> {
+        await this.boardPositionRepository.ClearBoard()
 
     }
-    async CreateBoard(size: number):Promise<void> {
+    async CreateBoard(size: number):Promise<GameBoardPositionEntity[]> {
+        console.log("service")
         return await this.boardPositionRepository.CreateBoard(size)
 
     }

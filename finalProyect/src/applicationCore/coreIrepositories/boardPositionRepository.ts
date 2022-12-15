@@ -1,8 +1,7 @@
 import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
-import { PositionType } from '../types.ts/types';
 
 export interface IBoardPositionRepository {
-    CreateBoard(size: number):Promise<void>
+    CreateBoard(size: number):Promise<GameBoardPositionEntity[]>
     GetAllPositions(): Promise<GameBoardPositionEntity[]>
-    ClearBoard(): Promise<GameBoardPositionEntity[]>
+    ClearBoard(): Promise<void>
 }
