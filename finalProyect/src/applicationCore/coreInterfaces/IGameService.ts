@@ -1,9 +1,9 @@
 import { GameStatus } from '../types.ts/types';
 import GameEntity from '../entities/gameEntity';
 export interface IGameService {
-    StartGame(boardSize: number): GameEntity
+    CreateGame(boardSize: number): GameEntity
     GetGameStatus(): GameStatus
-    SetGameStatus(gameStatus :GameStatus): void
+    UpdateGameStatus(gameStatus :GameStatus): void
     EndGame(): GameStatus
     RestartGame(): GameStatus
 }

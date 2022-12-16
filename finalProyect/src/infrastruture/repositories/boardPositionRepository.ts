@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+import { DefaultPlayerIDonBoard } from '../../applicationCore/types.ts/gameConfigs';
 import { IBoardPositionRepository } from '../../applicationCore/coreIrepositories/boardPositionRepository';
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
 import { AppDataSource } from '../data-source';
@@ -45,5 +46,36 @@ export default class BoardPositionRepository implements IBoardPositionRepository
         const boardPosition: BoardPosition = GameBoardPositionMapper.castToDBEntity(gameBoardPositionEntity)
         await repository.save(boardPosition)
         await AppDataSource.destroy()
+    }
+
+    async RemovePointOnBoard(positionId: number): Promise<void> {
+        await AppDataSource.initialize();
+        const repository = AppDataSource.getRepository(BoardPosition)
+        const deletedPoint:BoardPosition  = await repository.findOneByOrFail( {
+            id: positionId
+        })
+        deletedPoint.IdPlayer = DefaultPlayerIDonBoard
+        await repository.save(deletedPoint)
+        await AppDataSource.destroy()
+    }
+
+    async UpdatePointOnBoard(gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity> {
+        await AppDataSource.initialize();
+        const repository = AppDataSource.getRepository(BoardPosition)
+        const boardPosition: BoardPosition = GameBoardPositionMapper.castToDBEntity(gameBoardPositionEntity)
+        await repository.save(boardPosition)
+        await AppDataSource.destroy()
+        return gameBoardPositionEntity
+    }
+
+    async GetPointOnBoard(id: number) : Promise<GameBoardPositionEntity> {
+        await AppDataSource.initialize();
+        const repository = AppDataSource.getRepository(BoardPosition)
+        const pointOnBoard: BoardPosition = await repository.findOneByOrFail( {
+            id
+        })
+        const domainPointEntity = GameBoardPositionMapper.castToDomainEntitiy(pointOnBoard)
+        return domainPointEntity
+
     }
 }

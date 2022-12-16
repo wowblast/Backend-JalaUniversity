@@ -1,9 +1,11 @@
-import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
-import SnakePlayerEntity from '../entities/snakePlayerEntity';
-import { SnakeDirection } from '../types.ts/types';
+import SnakePlayerEntity from "../entities/snakePlayerEntity";
 
 export interface ISnakePlayerRepository {
-    CreateSnakePlayer(snakePlayerEntity: SnakePlayerEntity): Promise<Boolean>
-    ChangeSnakePlayerDirecction(id: number, snakeDirection: SnakeDirection): GameBoardPositionEntity
-    RemoveSnake(playerId: number): Promise<void>    
+  InsertSnakePlayer(snakePlayerEntity: SnakePlayerEntity): Promise<void>;
+  UpdateSnakePlayer(
+    snakePlayerEntity: SnakePlayerEntity
+  ): Promise<SnakePlayerEntity>;
+  DeleteSnakePlayer(playerId: number): Promise<void>;
+
+  GetSnakePlayer(playerId: number): Promise<SnakePlayerEntity>;
 }

@@ -32,7 +32,7 @@ export default class SnakePositionRepository implements ISnakePositionRepository
         return
 
     }
-    async CreateSnakePlayer(gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity> {
+    /*async CreateSnakePlayer(gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity> {
         await AppDataSource.initialize();
         const repository = AppDataSource.getRepository(BoardPosition)        
         const randomXposition = getLinearCongruentialGenerator(GetDaySecondsOfToday(),Math.round(size),size)
@@ -49,5 +49,5 @@ export default class SnakePositionRepository implements ISnakePositionRepository
         await repository.save(emptyPoint)
 
         return GameBoardPositionMapper.castToDomainEntitiy(emptyPoint)
-    }
+    }*/
 }
