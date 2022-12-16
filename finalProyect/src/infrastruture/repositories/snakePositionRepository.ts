@@ -9,7 +9,6 @@ import GameBoardPositionMapper from "../mappers/gameBoardPositionMapper";
 import { SnakeDirection } from "../../applicationCore/types.ts/types";
 import { injectable } from 'inversify';
 
-@injectable()
 export default class SnakePositionRepository implements ISnakePositionRepository {
     async MoveSnakeForwards(id: number, snakeDirection: SnakeDirection): Promise<Boolean> {
 

@@ -3,6 +3,8 @@ import { ISnakePlayerRepository } from '../../applicationCore/coreIrepositories/
 import { AppDataSource } from '../data-source';
 import SnakePlayer from '../entities/snakePlayer';
 import SnakePlayerMapper from '../mappers/snakePlayerMapper';
+import { injectable } from 'inversify';
+@injectable()
 export default class SnakePlayerRepository  implements ISnakePlayerRepository{
     async InsertSnakePlayer(snakePlayerEntity: SnakePlayerEntity): Promise<void>    {
         await AppDataSource.initialize();

@@ -68,11 +68,11 @@ export default class BoardPositionRepository implements IBoardPositionRepository
         return gameBoardPositionEntity
     }
 
-    async GetPointOnBoard(id: number) : Promise<GameBoardPositionEntity> {
+    async GetPointOnBoard(xPosition: number, yPosition: number) : Promise<GameBoardPositionEntity> {
         await AppDataSource.initialize();
         const repository = AppDataSource.getRepository(BoardPosition)
         const pointOnBoard: BoardPosition = await repository.findOneByOrFail( {
-            id
+            xPosition, yPosition
         })
         const domainPointEntity = GameBoardPositionMapper.castToDomainEntitiy(pointOnBoard)
         return domainPointEntity

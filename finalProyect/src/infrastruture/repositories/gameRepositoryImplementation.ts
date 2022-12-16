@@ -3,6 +3,8 @@ import { AppDataSource } from '../data-source';
 import GameEntity from '../../applicationCore/entities/gameEntity';
 import Game from '../entities/game';
 import GameMapper from '../mappers/gameMapper';
+import { injectable } from 'inversify';
+@injectable()
 export default class GameRepositoryImplementation  implements GameRepository{
     
     async InsertGameInstance(gameEntity: GameEntity): Promise<void>    {
