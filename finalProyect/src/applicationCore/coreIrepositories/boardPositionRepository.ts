@@ -8,4 +8,5 @@ export interface IBoardPositionRepository {
      RemovePointOnBoard(positionId: number): Promise<void>
      UpdatePointOnBoard(gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity>
      GetPointOnBoard(xPosition: number, yPosition: number) : Promise<GameBoardPositionEntity> 
+     GetBoardPointsByPlayerID(playerId: number): Promise<GameBoardPositionEntity[]>
 }

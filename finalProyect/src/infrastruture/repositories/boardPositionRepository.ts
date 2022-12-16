@@ -9,11 +9,11 @@ import GameBoardPositionMapper from '../mappers/gameBoardPositionMapper';
 export default class BoardPositionRepository implements IBoardPositionRepository {
     async CreateBoard(size: number): Promise<GameBoardPositionEntity[]> {
         await this.ClearBoard()
-
+        console.log("create", size)
         await AppDataSource.initialize();
         const repository = AppDataSource.getRepository(BoardPosition)
         const boardPosition = new BoardPosition()
-        boardPosition.IdPlayer  = -1;
+        boardPosition.playerId  = -1;
         boardPosition.positionType = 'empty'
         for(let x = 0; x< size; x++) {
             for(let y = 0; y< size; y++) {
@@ -31,6 +31,9 @@ export default class BoardPositionRepository implements IBoardPositionRepository
         const repository = AppDataSource.getRepository(BoardPosition)
         const points =await repository.find()
         const gameBoardPosition:GameBoardPositionEntity[]  = points.map(GameBoardPositionMapper.castToDomainEntitiy)
+        console.log(gameBoardPosition)
+        await AppDataSource.destroy()  
+
         return gameBoardPosition
     }
     async ClearBoard(): Promise<void> {
@@ -54,12 +57,13 @@ export default class BoardPositionRepository implements IBoardPositionRepository
         const deletedPoint:BoardPosition  = await repository.findOneByOrFail( {
             id: positionId
         })
-        deletedPoint.IdPlayer = DefaultPlayerIDonBoard
+        deletedPoint.playerId = DefaultPlayerIDonBoard
         await repository.save(deletedPoint)
         await AppDataSource.destroy()
     }
 
     async UpdatePointOnBoard(gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity> {
+        console.log("repo")
         await AppDataSource.initialize();
         const repository = AppDataSource.getRepository(BoardPosition)
         const boardPosition: BoardPosition = GameBoardPositionMapper.castToDBEntity(gameBoardPositionEntity)
@@ -71,11 +75,23 @@ export default class BoardPositionRepository implements IBoardPositionRepository
     async GetPointOnBoard(xPosition: number, yPosition: number) : Promise<GameBoardPositionEntity> {
         await AppDataSource.initialize();
         const repository = AppDataSource.getRepository(BoardPosition)
-        const pointOnBoard: BoardPosition = await repository.findOneByOrFail( {
-            xPosition, yPosition
+        const pointOnBoard: BoardPosition = await repository.findOne( {
+            where: { xPosition , yPosition }
         })
         const domainPointEntity = GameBoardPositionMapper.castToDomainEntitiy(pointOnBoard)
+        await AppDataSource.destroy()
         return domainPointEntity
 
+    }
+
+    async GetBoardPointsByPlayerID(playerId: number): Promise<GameBoardPositionEntity[]> {
+        await AppDataSource.initialize();
+        const repository = AppDataSource.getRepository(BoardPosition)
+        const points =await repository.findBy({playerId})
+        const gameBoardPosition:GameBoardPositionEntity[]  = points.map(GameBoardPositionMapper.castToDomainEntitiy)
+        console.log(gameBoardPosition)
+        await AppDataSource.destroy()  
+
+        return gameBoardPosition
     }
 }

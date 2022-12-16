@@ -8,6 +8,7 @@ import { injectable } from 'inversify';
 export default class SnakePlayerRepository  implements ISnakePlayerRepository{
     async InsertSnakePlayer(snakePlayerEntity: SnakePlayerEntity): Promise<void>    {
         await AppDataSource.initialize();
+
         const repository = AppDataSource.getRepository(SnakePlayer)
         const snakePlayer: SnakePlayer = SnakePlayerMapper.castToDBEntity(snakePlayerEntity)
         await repository.save(snakePlayer)
@@ -40,6 +41,7 @@ export default class SnakePlayerRepository  implements ISnakePlayerRepository{
             playerId: playerId
         })
         const snakePlayerEntity = SnakePlayerMapper.castToDomainEntitiy(snakePlayer)
+        await AppDataSource.destroy()
         return snakePlayerEntity
     }
 }

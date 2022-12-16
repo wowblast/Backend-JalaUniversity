@@ -1,7 +1,7 @@
 import { ISnakePositionRepository } from "../../applicationCore/coreIrepositories/snakePositionRepository";
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
 import SnakePlayerEntity from "../../applicationCore/entities/snakePlayerEntity";
-import { GetDaySecondsOfToday, GetMinutesOfToday } from "../../applicationCore/utils/getDaytime";
+import { GetDaySecondsOfToday, GetMinutesOfToday } from "../../applicationCore/utils/convertDateToArray";
 import getLinearCongruentialGenerator from '../../applicationCore/utils/generateRandom';
 import BoardPosition from '../entities/gameBoardPosition';
 import { AppDataSource } from "../data-source";

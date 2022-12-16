@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { createSnakePlayer, updateSnakePlayerDirecction, updateSnakePlayerName } from '../controllers/snakePlayerController';
+import { createSnakePlayer, moveSnakeForwards, updateSnakePlayerDirecction, updateSnakePlayerName } from '../controllers/snakePlayerController';
 
 const routes = Router();
 
-routes.get('/createSnakePlayer', createSnakePlayer);
-routes.post('/updateSnakePlayerDirecction', updateSnakePlayerDirecction);
-routes.post('/updateSnakePlayerName', updateSnakePlayerName);
+routes.post('/createSnakePlayer', createSnakePlayer);
+routes.put('/updateSnakePlayerDirecction', updateSnakePlayerDirecction);
+routes.put('/updateSnakePlayerName', updateSnakePlayerName);
+routes.put('/moveSnakeForwards', moveSnakeForwards);
+
 
 export default routes;

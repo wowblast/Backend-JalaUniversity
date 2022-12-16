@@ -40,6 +40,8 @@ export default class GameRepositoryImplementation  implements GameRepository{
             id
         })
         const gameEntity = GameMapper.castToDomainEntitiy(gameInstance)
+        await AppDataSource.destroy();
+
         return gameEntity
     }
 }

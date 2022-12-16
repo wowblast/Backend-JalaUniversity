@@ -15,6 +15,6 @@ export default class GameBoardPosition {
     positionType: string
     
     @Column()
-    IdPlayer: number
+    playerId: number
 
 }
