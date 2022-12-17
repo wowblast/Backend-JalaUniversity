@@ -3,6 +3,7 @@ import { IBoardPositionService } from "../coreInterfaces/IBoardPositionService";
 import { BoardPositionReposioryID } from '../types.ts/inversifyTypes';
 import { IBoardPositionRepository } from '../coreIrepositories/boardPositionRepository';
 import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
+import { BoardPositionType } from '../types.ts/types';
 
 @injectable()
 export default class BoardPositionService implements IBoardPositionService {
@@ -37,6 +38,14 @@ export default class BoardPositionService implements IBoardPositionService {
 
     async GetBoardPositionByPlayedId(playerId: number): Promise<GameBoardPositionEntity[]> {
         return this.boardPositionRepository.GetBoardPointsByPlayerID(playerId)
+    }
+
+    async GetBoardPointByPlayerIDAndPositionType(playerId: number, boardPositionType: BoardPositionType): Promise<GameBoardPositionEntity> {
+        return this.boardPositionRepository.GetBoardPointByPlayerIDAndPositionType(playerId, boardPositionType)
+    }
+
+    async DeleteBoardPositionByPlayedId(playerId: number): Promise<void> {
+        return this.boardPositionRepository.RemovePointOnBoard(playerId)
     }
 
 }

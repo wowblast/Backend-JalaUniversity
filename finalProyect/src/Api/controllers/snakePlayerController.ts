@@ -11,7 +11,7 @@ export const  createSnakePlayer = async  (req, res) => {
     console.log("controller")
 		try {			
             const snakePlayer: SnakePlayerEntity = await snakePlayerService.CreateSnakePlayer(req.body.id, req.body.name, req.body.snakeDirection)
-            snakePlayerService.UpdateSnakePlayerDirecction
+            //snakePlayerService.UpdateSnakePlayerDirecction
 			res.json(snakePlayer)
 		}
 		catch (err) {

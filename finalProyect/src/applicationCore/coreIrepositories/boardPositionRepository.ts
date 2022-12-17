@@ -1,4 +1,5 @@
 import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
+import { BoardPositionType } from '../types.ts/types';
 
 export interface IBoardPositionRepository {
      CreateBoard(size: number): Promise<GameBoardPositionEntity[]>    
@@ -9,4 +10,5 @@ export interface IBoardPositionRepository {
      UpdatePointOnBoard(gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity>
      GetPointOnBoard(xPosition: number, yPosition: number) : Promise<GameBoardPositionEntity> 
      GetBoardPointsByPlayerID(playerId: number): Promise<GameBoardPositionEntity[]>
+     GetBoardPointByPlayerIDAndPositionType(player: number, boardPositionType: BoardPositionType): Promise<GameBoardPositionEntity>
 }

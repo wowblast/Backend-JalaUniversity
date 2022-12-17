@@ -10,7 +10,7 @@ export const BoardPositionTypesList  ={
     Head: 'head',
     Boody: 'body',
     Food: 'food',
-    Empty : 'Empty'
+    Empty : 'empty'
 }
 
 export const SnakeDirectionsList = {

@@ -6,8 +6,8 @@ import BoardPosition from './boardPosition';
 export default class GameBoardPositionEntity extends BoardPosition {  
   private positionId: number
   private playedId: number
-  constructor(playedId: number, positionId: number, BoardPositionType:BoardPositionType, xPosition: number, yPosition: number) {
-    super(BoardPositionType,xPosition,yPosition);
+  constructor(playedId: number, positionId: number, boardPositionType:BoardPositionType, xPosition: number, yPosition: number) {
+    super(boardPositionType,xPosition,yPosition);
     this.positionId = positionId  
     this.playedId = playedId 
 }  
