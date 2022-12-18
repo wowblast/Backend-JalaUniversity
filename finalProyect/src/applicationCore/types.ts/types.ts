@@ -1,4 +1,4 @@
-export type SnakeDirection = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+export type SnakeDirection = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'| '-';
 export type BoardPositionType = 'head' |'body' | 'food' | 'empty';
 export type GameStatus = 'Ready' | 'Playing' | 'Ended'
 export const GameStatusStates  ={

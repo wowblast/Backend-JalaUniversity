@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { DefaultPlayerIDonBoard } from '../../applicationCore/types.ts/gameConfigs';
+import { DefaultNextPointBoardDirection, DefaultPlayerIDonBoard, DefaultSnakeBodyIdentifier } from '../../applicationCore/types.ts/gameConfigs';
 import { IBoardPositionRepository } from '../../applicationCore/coreIrepositories/boardPositionRepository';
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
 import { AppDataSource } from '../data-source';
@@ -23,6 +23,8 @@ export default class BoardPositionRepository implements IBoardPositionRepository
             for(let y = 0; y< size; y++) {
                 boardPosition.xPosition = x
                 boardPosition.yPosition = y
+                boardPosition.snakeBodyIndentifier = DefaultSnakeBodyIdentifier
+                boardPosition.snakeDirection = DefaultNextPointBoardDirection
                 await this.repository.save(boardPosition);
             }
         }

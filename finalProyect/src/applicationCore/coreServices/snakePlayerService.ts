@@ -16,7 +16,7 @@ import {
 } from "../types.ts/types";
 import getLinearCongruentialGenerator from "../utils/generateRandom";
 import GameRepository from "../coreIrepositories/gameRepository";
-import { DefaultGameID, DefaultPlayerIDonBoard } from "../types.ts/gameConfigs";
+import { DefaultGameID, DefaultPlayerIDonBoard, DefaultFoodID, PointsPerFood, DefaultSnakeBodyIdentifier, DefaultNextPointBoardDirection } from '../types.ts/gameConfigs';
 import GameEntity from "../entities/gameEntity";
 import GameBoardPositionEntity from "../entities/gameBoardPositionEntity";
 import BoardPositionService from "./boardPositionService";
@@ -72,11 +72,13 @@ export default class SnakePlayerService implements ISnakePlayerService {
     return updatedSnakePlayer;
   }
 
-  async MoveSnakeForward(id: number): Promise<Boolean> {
-    const snakePlayer: SnakePlayerEntity = await this.snakePlayerRepository.GetSnakePlayer(id)
-    const nextPosition = await this.getNextPosition(await this.getSnakeHead(id), snakePlayer.getSnakeDirection())
+  async MoveSnakeForward(id: number, snakeDirection: string): Promise<Boolean> {
+    await this.UpdateSnakePlayerDirecction(id, snakeDirection)
+    await this.snakePlayerRepository.GetSnakePlayer(id)
+    const nextPosition = await this.getNextPosition(await this.getSnakeHead(id), snakeDirection as SnakeDirection)
     const isSnakeMoved = await this.moveifNextPositionIsAvailable(nextPosition, id)
     await this.removeSnakeMoveIfnotMoved(isSnakeMoved,id)
+    await this.printBoardOnConsole()
     return isSnakeMoved
 
   }
@@ -129,6 +131,8 @@ export default class SnakePlayerService implements ISnakePlayerService {
     boardPoint.setBoardPositionType(
       BoardPositionTypesList.Head as BoardPositionType
     );
+    boardPoint.setSnakeBodyIdentifier(snakePlayer.getPLayerId())
+    boardPoint.setSnakeDirection(snakePlayer.getSnakeDirection())
     return boardPoint
   }
   
@@ -148,8 +152,13 @@ export default class SnakePlayerService implements ISnakePlayerService {
   setNewPositions(oldPosition: GameBoardPositionEntity, newPosition: GameBoardPositionEntity): [GameBoardPositionEntity,GameBoardPositionEntity] {
     newPosition.setPlayerId(oldPosition.getPlayerId())
     newPosition.setBoardPositionType(oldPosition.getBoardPositionType())
+    newPosition.setSnakeBodyIdentifier(oldPosition.getSnakeBodyIdentifier())
+    newPosition.setSnakeDirection(oldPosition.getSnakeDirection())
     oldPosition.setBoardPositionType(BoardPositionTypesList.Empty as BoardPositionType)
     oldPosition.setPlayerId(DefaultPlayerIDonBoard)
+    oldPosition.setSnakeBodyIdentifier(DefaultSnakeBodyIdentifier)
+    oldPosition.setSnakeDirection(DefaultNextPointBoardDirection)
+
     return [oldPosition, newPosition]
   }
 
@@ -159,31 +168,41 @@ export default class SnakePlayerService implements ISnakePlayerService {
   }
 
   async moveSnakeBody(snakeBody: GameBoardPositionEntity[], skaneDirection: SnakeDirection): Promise<void> {
-    let oldPosition: GameBoardPositionEntity
-    let newPosition: GameBoardPositionEntity
+    let oldPosition: GameBoardPositionEntity = null
+    let newPosition: GameBoardPositionEntity = null
+    //console.log(snakeBody[0].getPlayerId(), "ddsdd")  
     for (let index = 0; index < snakeBody.length; index++) {
-        oldPosition = snakeBody[index]
-        newPosition = await this.getNextPosition(oldPosition, skaneDirection);
-        [oldPosition, newPosition] = this.setNewPositions(oldPosition, newPosition)
-        await this.saveNewSnakeBodyPositions(oldPosition, newPosition)      
+      //oldPosition = snakeBody[index]
+      //console.log("oldpos",oldPosition)
+      //console.log("oldpos", oldPosition.getBoardPositionType())
+      //newPosition = await this.getNextPosition(oldPosition, oldPosition.getSnakeDirection())      
+      //newPosition = await this.getNextPosition(oldPosition, skaneDirection);
+      [oldPosition, newPosition] = this.setNewPositions(snakeBody[index], await this.getNextPosition(snakeBody[index], snakeBody[index].getSnakeDirection()))
+      //console.log(oldPosition, newPosition)
+      await this.saveNewSnakeBodyPositions(oldPosition, newPosition)      
     }
   }
 
   async moveifNextPositionIsAvailable(nextPoint: GameBoardPositionEntity, id: number): Promise<boolean>{
     const snakePlayer: SnakePlayerEntity = await this.snakePlayerRepository.GetSnakePlayer(id)
     const snakeBody :GameBoardPositionEntity[] = await this.boardPositionService.GetBoardPositionByPlayedId(id)
+    const sortedSnakeBody = this.sortSnakebodyPointsByBodyIndentifier(snakeBody)
     const snakeDirection = snakePlayer.getSnakeDirection()
     let isSnakeMoved = false
     switch (nextPoint.getBoardPositionType()) {
       case BoardPositionTypesList.Empty:
-          await this.moveSnakeBody(snakeBody,snakeDirection)
+          const updatedSnakeDirection:GameBoardPositionEntity[] = this.updateSnakeDireccionOnSnake(sortedSnakeBody,snakeDirection)
+          //console.log(updatedSnakeDirection)
+          await this.moveSnakeBody(updatedSnakeDirection,snakeDirection)
+          //this.inserBodyOfSnakePlayer(id)
           isSnakeMoved = true        
           break;
       case BoardPositionTypesList.Food:
-        // consume food
-          await this.moveSnakeBody(snakeBody,snakeDirection)
-          isSnakeMoved = true        
-
+          await this.consumeSnakeFood(nextPoint)
+          await this.increaseSizeofSnakePlayer(snakePlayer)        
+          await this.moveSnakeBody(updatedSnakeDirection,snakeDirection)
+          await this.InsertSnakeFoodOnBoard()
+          isSnakeMoved = true
           break;
     }
     return isSnakeMoved
@@ -194,15 +213,15 @@ export default class SnakePlayerService implements ISnakePlayerService {
     switch (skaneDirection) {
         case SnakeDirectionsList.UP:
             return await this.boardPositionService.GetBoardPositionByPosition(oldPosition.getXPosition(),
-             (oldPosition.getYPosition() + 1) % boardSize)                
+             (boardSize +oldPosition.getYPosition() + 1) % boardSize)                
         case SnakeDirectionsList.DOWN:
             return await this.boardPositionService.GetBoardPositionByPosition(oldPosition.getXPosition(),
-              (oldPosition.getYPosition() - 1) % boardSize)
+             (boardSize +oldPosition.getYPosition() - 1) % boardSize)
         case SnakeDirectionsList.LEFT:
-            return await this.boardPositionService.GetBoardPositionByPosition((oldPosition.getXPosition()
+            return await this.boardPositionService.GetBoardPositionByPosition((boardSize +oldPosition.getXPosition()
               - 1) % boardSize, oldPosition.getYPosition()) 
         case SnakeDirectionsList.RIGHT:
-            return await this.boardPositionService.GetBoardPositionByPosition((oldPosition.getXPosition()
+            return await this.boardPositionService.GetBoardPositionByPosition((boardSize +oldPosition.getXPosition()
               + 1) % boardSize, oldPosition.getYPosition())
     }
   }
@@ -232,6 +251,61 @@ export default class SnakePlayerService implements ISnakePlayerService {
     await this.snakePlayerRepository.DeleteSnakePlayer(id)
     
   }
+
+  async InsertSnakeFoodOnBoard(): Promise<void> {
+    const emptyBoardPoint: GameBoardPositionEntity = await this.getEmptyBoardPosition()
+    emptyBoardPoint.setPlayerId(DefaultFoodID)
+    emptyBoardPoint.setBoardPositionType(BoardPositionTypesList.Food as BoardPositionType)
+    await this.boardPositionService.UpdateBoardPosition(emptyBoardPoint)
+  }
+
+  async consumeSnakeFood(foodOnBoard: GameBoardPositionEntity): Promise<void> {
+    await this.snakeFoodService.RemoveFoodPointOnBoard(foodOnBoard.getPlayerId())
+  }
+
+  async increaseSizeofSnakePlayer(snakePlayer : SnakePlayerEntity) {
+    snakePlayer.setSnakeSize(snakePlayer.getSnakeSize() + PointsPerFood)
+    await this.snakePlayerRepository.UpdateSnakePlayer(snakePlayer)
+  }
+
+  async inserBodyOfSnakePlayer(id: number) {
+    const body = await this.boardPositionService.GetBoardPositionByPlayedId(id)
+
+    //(x < y) ? -1 : ((x > y) ? 1 : 0));
+  }
+
+  sortSnakebodyPointsByBodyIndentifier(snakeBody: GameBoardPositionEntity[]) {
+    return snakeBody.sort((a, b) => a.getSnakeBodyIdentifier() < b.getSnakeBodyIdentifier() ? -1 : a.getSnakeBodyIdentifier() < b.getSnakeBodyIdentifier() ? 1 : 0)
+  }
+
+  updateSnakeDireccionOnSnake(snakeBody: GameBoardPositionEntity[], snakeDirection: SnakeDirection): GameBoardPositionEntity[] {
+    let oldDirection : SnakeDirection
+    let lastSnakePointDirection: SnakeDirection
+    return snakeBody.map((snakePoint, index) => {
+      oldDirection = snakePoint.getSnakeDirection()
+      index != 0 ? snakePoint.setSnakeDirection(lastSnakePointDirection): snakePoint.setSnakeDirection(snakeDirection)      
+      lastSnakePointDirection = oldDirection
+
+      return snakePoint
+    })
+  }
+
+  async printBoardOnConsole() {
+    const allPositions = await this.boardPositionService.GetAllPositions()
+        let pos = allPositions[0]
+        console.log()
+        for (let x = 4; 0 <= x; x--) {
+            for (let y = 0; y < 5; y++) {
+                pos = allPositions.filter((poss) => poss.getXPosition() == y && poss.getYPosition() == x)[0]
+                process.stdout.write("[" +pos.getPlayerId()+"] ");
+            }
+            console.log()            
+        }
+  }
+
+ 
+
+ 
   
 
 }

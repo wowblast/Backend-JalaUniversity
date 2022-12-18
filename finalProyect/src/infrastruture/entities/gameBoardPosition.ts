@@ -17,4 +17,10 @@ export default class GameBoardPosition {
     @Column()
     playerId: number
 
+    @Column()
+    snakeBodyIndentifier: number
+
+    @Column()
+    snakeDirection: string
+
 }

@@ -40,8 +40,9 @@ export const updateSnakePlayerName = async  (req, res) => {
 }
 
 export const moveSnakeForwards = async  (req, res) => {
-    try {   
-        await snakePlayerService.MoveSnakeForward(req.body.id)
+    try {
+        const requestBody = req.body
+        await snakePlayerService.MoveSnakeForward(requestBody.id, requestBody.snakeDirection)
         res.json({"moved": "true"})
     }
     catch (err) {

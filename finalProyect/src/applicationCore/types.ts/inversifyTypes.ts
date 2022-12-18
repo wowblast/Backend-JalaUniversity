@@ -5,4 +5,5 @@ export const SnakePositionRepositoryID = 'SnakePositionRepositoryID'
 export const GameRepositoryID = 'GameRepositoryID'
 export const BoardPositionServiceID = 'BoardPositionServiceID'
 export const SnakeFoodServiceIdentifier = 'SnakeFoodServiceIdentifier'
+export const SnakePlayerServiceIdentifier = 'SnakePlayerServiceIdentifier'
 

@@ -14,9 +14,8 @@ export default class BoardPositionService implements IBoardPositionService {
 
     }
 
-    async GetAllPositions(): Promise<GameBoardPositionEntity[]> {
+    async GetAllPositions(): Promise<GameBoardPositionEntity[]> {        
         return  await this.boardPositionRepository.GetAllPositions()
-
     }
     async ClearBoard(): Promise<void> {
         await this.boardPositionRepository.ClearBoard()
