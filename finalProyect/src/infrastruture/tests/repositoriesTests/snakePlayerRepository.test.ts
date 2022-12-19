@@ -1,7 +1,6 @@
 import SnakePlayer from '../../entities/snakePlayer';
 import { TestHelper } from "../testhelper";
-import GameBoardPositionEntity from '../../../applicationCore/entities/gameBoardPositionEntity';
-import SnakePlayerRepositoryImplementation from '../../repositories/snakePlayerRepository';
+import SnakePlayerRepositoryImplementation from '../../repositories/snakePlayerRepositoryImplementation';
 import SnakePlayerEntity from '../../../applicationCore/entities/snakePlayerEntity';
 import { Repository } from 'typeorm';
 
@@ -77,7 +76,7 @@ describe("snake player repository", () => {
     await repo.save(snakePlayer)
     await snakePlayerRepositoryImplementation.DeleteSnakePlayer(2)
     const results = await  repo.findBy({ playerId: 2})
-    expect(results.length).toBe(0);
+        expect(results.length).toBe(0);
   });
 
 })

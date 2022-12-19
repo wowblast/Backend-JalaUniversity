@@ -3,7 +3,7 @@ import { IBoardPositionRepository } from "../coreIrepositories/boardPositionRepo
 import { BoardPositionReposioryID, BoardPositionServiceID, GameRepositoryID, SnakeFoodServiceIdentifier, SnakePlayerRepositoryID, SnakePlayerServiceIdentifier } from '../types.ts/inversifyTypes';
 import BoardPositionRepository from "../../infrastruture/repositories/boardPositionRepository";
 import { ISnakePlayerRepository } from '../coreIrepositories/snakePlayeRepository';
-import SnakePlayerRepository from '../../infrastruture/repositories/snakePlayerRepository';
+import SnakePlayerRepository from '../../infrastruture/repositories/snakePlayerRepositoryImplementation';
 import GameRepository from '../coreIrepositories/gameRepository';
 import GameRepositoryImplementation from '../../infrastruture/repositories/gameRepositoryImplementation';
 import { IBoardPositionService } from '../coreInterfaces/IBoardPositionService';
