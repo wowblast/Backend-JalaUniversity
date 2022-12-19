@@ -17,5 +17,13 @@ export const SnakeDirectionsList = {
     UP: 'UP',
     DOWN: 'DOWN',
     LEFT: 'LEFT',
-    RIGHT: 'RIGHT'
+    RIGHT: 'RIGHT',
+    DEFAULT: '-'
+}
+
+export const OpositeSnakeDirectionsList = {
+    UP: 'DOWN',
+    DOWN: 'UP',
+    LEFT: 'RIGHT',
+    RIGHT: 'LEFT'
 }
