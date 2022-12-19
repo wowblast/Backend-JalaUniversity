@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { DefaultNextPointBoardDirection, DefaultPlayerIDonBoard, DefaultSnakeBodyIdentifier } from '../../applicationCore/types.ts/gameConfigs';
-import { IBoardPositionRepository } from '../../applicationCore/coreIrepositories/boardPositionRepository';
+import { BoardPositionRepository } from '../../applicationCore/coreIrepositories/boardPositionRepository';
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
 import { AppDataSource } from '../data-source';
 import BoardPosition from '../entities/gameBoardPosition';
@@ -8,7 +8,7 @@ import GameBoardPositionMapper from '../mappers/gameBoardPositionMapper';
 import { BoardPositionType, BoardPositionTypesList } from '../../applicationCore/types.ts/types';
 import { Repository } from 'typeorm';
 @injectable()
-export default class BoardPositionRepository implements IBoardPositionRepository {
+export default class BoardPositionRepositoryImplementation implements BoardPositionRepository {
     private repository: Repository<BoardPosition>
     constructor() {
         this.repository = AppDataSource.getRepository(BoardPosition)
@@ -53,7 +53,7 @@ export default class BoardPositionRepository implements IBoardPositionRepository
         await this.repository.save(boardPosition)
     }
 
-    async RemovePointOnBoard(positionId: number): Promise<void> {
+    async ClearPointOnBoard(positionId: number): Promise<void> {
         
         const deletedPoint:BoardPosition  = await this.repository.findOneByOrFail( {
             id: positionId

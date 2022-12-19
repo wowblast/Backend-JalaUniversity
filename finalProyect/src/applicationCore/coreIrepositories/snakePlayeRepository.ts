@@ -1,6 +1,6 @@
 import SnakePlayerEntity from "../entities/snakePlayerEntity";
 
-export interface ISnakePlayerRepository {
+export interface SnakePlayerRepository {
   InsertSnakePlayer(snakePlayerEntity: SnakePlayerEntity): Promise<void>;
   UpdateSnakePlayer(
     snakePlayerEntity: SnakePlayerEntity
