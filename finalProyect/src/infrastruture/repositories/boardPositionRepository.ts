@@ -13,6 +13,10 @@ export default class BoardPositionRepository implements IBoardPositionRepository
     constructor() {
         this.repository = AppDataSource.getRepository(BoardPosition)
     }
+
+    setRepo(repository) {
+        this.repository = repository
+    }
     async CreateBoard(size: number): Promise<GameBoardPositionEntity[]> {
         await this.ClearBoard()
         
