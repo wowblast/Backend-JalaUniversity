@@ -1,4 +1,4 @@
-import BoardService from './applicationCore/coreServices/boardPositionService';
+import BoardService from './applicationCore/coreServices/boardPositionServiceImplementation';
 console.log("hello")
  import getLinearCongruentialGenerator from './applicationCore/utils/generateRandom'
 

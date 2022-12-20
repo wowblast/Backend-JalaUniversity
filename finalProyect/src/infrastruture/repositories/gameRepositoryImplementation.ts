@@ -41,7 +41,6 @@ export default class GameRepositoryImplementation  implements GameRepository{
             id
         })
         const gameEntity = GameMapper.castToDomainEntitiy(gameInstance)
-
         return gameEntity
     }
 }

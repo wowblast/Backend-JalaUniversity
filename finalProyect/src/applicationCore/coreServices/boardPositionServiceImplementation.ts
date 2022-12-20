@@ -1,20 +1,21 @@
 import { inject, injectable } from "inversify";
-import { IBoardPositionService } from "../coreInterfaces/IBoardPositionService";
+import { BoardPositionService } from "../coreInterfaces/BoardPositionService";
 import { BoardPositionReposioryID } from '../types.ts/inversifyTypes';
-import { IBoardPositionRepository } from '../coreIrepositories/boardPositionRepository';
+import { BoardPositionRepository } from '../coreIrepositories/boardPositionRepository';
 import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
 import { BoardPositionType } from '../types.ts/types';
 
 @injectable()
-export default class BoardPositionService implements IBoardPositionService {
+export default class BoardPositionServiceImplementation implements BoardPositionService {
 
-   private boardPositionRepository: IBoardPositionRepository
-    constructor(@inject(BoardPositionReposioryID) boardPositionRepository: IBoardPositionRepository ){
+   private boardPositionRepository: BoardPositionRepository
+    constructor(@inject(BoardPositionReposioryID) boardPositionRepository: BoardPositionRepository ){
         this.boardPositionRepository = boardPositionRepository
 
     }
 
-    async GetAllPositions(): Promise<GameBoardPositionEntity[]> {        
+    async GetAllPositions(): Promise<GameBoardPositionEntity[]> {   
+        await this.printBoardOnConsole()     
         return  await this.boardPositionRepository.GetAllPositions()
     }
     async ClearBoard(): Promise<void> {
@@ -44,7 +45,20 @@ export default class BoardPositionService implements IBoardPositionService {
     }
 
     async DeleteBoardPositionByPlayedId(playerId: number): Promise<void> {
-        return this.boardPositionRepository.RemovePointOnBoard(playerId)
+        return this.boardPositionRepository.ClearPointOnBoard(playerId)
     }
+
+    async printBoardOnConsole() {
+        const allPositions = await this.boardPositionRepository.GetAllPositions()
+            let pos = allPositions[0]
+            console.log()
+            for (let x = 4; 0 <= x; x--) {
+                for (let y = 0; y < 5; y++) {
+                    pos = allPositions.filter((poss) => poss.getXPosition() == y && poss.getYPosition() == x)[0]
+                    process.stdout.write("[" +pos.getPlayerId()+"] ");
+                }
+                console.log()            
+            }
+      }
 
 }

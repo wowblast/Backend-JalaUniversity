@@ -1,4 +1,3 @@
-import { ISnakePositionRepository } from "../../applicationCore/coreIrepositories/snakePositionRepository";
 
 import BoardPosition from '../entities/gameBoardPosition';
 import { AppDataSource } from "../data-source";
@@ -9,7 +8,7 @@ import { Repository } from "typeorm";
 import GameBoardPositionEntity from "../../applicationCore/entities/gameBoardPositionEntity";
 
 @injectable()
-export default class SnakePositionRepositor {
+export default class SnakePositionRepositoryImplementation {
     
     private repository: Repository<BoardPosition>
     constructor() {

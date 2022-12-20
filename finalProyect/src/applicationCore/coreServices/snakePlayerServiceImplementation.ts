@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
-import { ISnakePlayerService } from "../coreInterfaces/ISnakePlayerService";
+import { SnakePlayerService } from "../coreInterfaces/SnakePlayerService";
 import SnakePlayerEntity from "../entities/snakePlayerEntity";
-import { ISnakePlayerRepository } from "../coreIrepositories/snakePlayeRepository";
+import { SnakePlayerRepository } from "../coreIrepositories/snakePlayeRepository";
 import {
   SnakePlayerRepositoryID,
   GameRepositoryID,
@@ -19,20 +19,20 @@ import GameRepository from "../coreIrepositories/gameRepository";
 import { DefaultGameID, DefaultPlayerIDonBoard, DefaultFoodID, PointsPerFood, DefaultSnakeBodyIdentifier, DefaultNextPointBoardDirection } from '../types.ts/gameConfigs';
 import GameEntity from "../entities/gameEntity";
 import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
-import BoardPositionService from "./boardPositionService";
+import BoardPositionService from "./boardPositionServiceImplementation";
 import { SnakeFoodServiceIdentifier } from '../types.ts/inversifyTypes';
 import { SnakeFoodService } from '../coreInterfaces/SnakeFoodService';
 import { OpositeSnakeDirectionsList } from '../types.ts/types';
 
 @injectable()
-export default class SnakePlayerService implements ISnakePlayerService {
+export default class SnakePlayerServiceImplementation implements SnakePlayerService {
   private boardPositionService: BoardPositionService;
-  private snakePlayerRepository: ISnakePlayerRepository;
+  private snakePlayerRepository: SnakePlayerRepository;
   private gameRepository: GameRepository;
   private snakeFoodService : SnakeFoodService
   constructor(
     @inject(SnakePlayerRepositoryID)
-    snakePlayerRepository: ISnakePlayerRepository,
+    snakePlayerRepository: SnakePlayerRepository,
     @inject(BoardPositionServiceID) boardPositionService: BoardPositionService,
     @inject(GameRepositoryID) gameRepository: GameRepository,
     @inject(SnakeFoodServiceIdentifier ) snakeFoodService: SnakeFoodService
@@ -96,12 +96,12 @@ export default class SnakePlayerService implements ISnakePlayerService {
   getRandomCoordinatesPoints(maxnumber: number) {
     let seedDate = new Date();    
     const xPosition = getLinearCongruentialGenerator(
-        seedDate.getMilliseconds() * seedDate.getMinutes(),
+        seedDate.getMilliseconds() * seedDate.getMinutes() * seedDate.getUTCDate() * seedDate.getTime(),
         seedDate.getHours(),
         maxnumber
       );
     const yPosition = getLinearCongruentialGenerator(
-        Math.round(seedDate.getSeconds()/seedDate.getMonth()),
+        Math.round(seedDate.getTime() * seedDate.getDay() * seedDate.getSeconds()/seedDate.getMonth()),
         seedDate.getDay(),
         maxnumber
       );
@@ -189,22 +189,15 @@ export default class SnakePlayerService implements ISnakePlayerService {
           isSnakeMoved = true        
           break;
       case BoardPositionTypesList.Food:
-          await this.consumeSnakeFood(nextPoint)
-         
-          //await this.moveSnakeBody(updatedSnakeDirection)
-          const newSnakeBody = await this.getSorteSnakeBodyOnBoard(id)
-          console.log("ancutalpi",newSnakeBody)
-
-          //console.log("normla dir",newSnakeBody[newSnakeBody.length-1].getSnakeDirection())
-          //console.log("test upo",OpositeSnakeDirectionsList["UP"] )
-          //console.log("directruiin",OpositeSnakeDirectionsList[newSnakeBody[newSnakeBody.length-1].getSnakeDirection()] )
-          //console.log("ancutalpi",newSnakeBody[newSnakeBody.length-1])
+          await this.consumeSnakeFood(nextPoint)         
+          const newSnakeBody = await this.getSorteSnakeBodyOnBoard(id)        
           await this.inserBodyOfSnakePlayer(newSnakeBody[newSnakeBody.length-1],
-            await this.getNextPosition(newSnakeBody[newSnakeBody.length-1],OpositeSnakeDirectionsList[newSnakeBody[newSnakeBody.length-1].getSnakeDirection()]))
-
-          await this.increaseSizeofSnakePlayer(snakePlayer)        
+            await this.getNextPosition(newSnakeBody[newSnakeBody.length-1],
+              OpositeSnakeDirectionsList[newSnakeBody[newSnakeBody.length-1].getSnakeDirection()]))
+          await this.increaseSizeofSnakePlayer(snakePlayer) 
+          await this.increaseScoreofSnakePlayer(snakePlayer)       
           await this.InsertSnakeFoodOnBoard()
-          //await this.MoveSnakeForward(id, snakeDirection)
+          await this.MoveSnakeForward(id, snakeDirection)
           isSnakeMoved = true
           break;
     }
@@ -239,6 +232,7 @@ export default class SnakePlayerService implements ISnakePlayerService {
   }
 
   async removeSnakeMoveIfnotMoved(isSnakeMoved: boolean, id: number):Promise<void> {
+    console.log("removed? ", !isSnakeMoved)
     !isSnakeMoved && this.removeSnakePlayer(id)
   }
 
@@ -271,7 +265,6 @@ export default class SnakePlayerService implements ISnakePlayerService {
   }
 
   async consumeSnakeFood(foodOnBoard: GameBoardPositionEntity): Promise<void> {
-    console.log("food",foodOnBoard)
     await this.snakeFoodService.RemoveFoodPointOnBoard(foodOnBoard.getPositionId())
   }
 
@@ -280,12 +273,16 @@ export default class SnakePlayerService implements ISnakePlayerService {
     await this.snakePlayerRepository.UpdateSnakePlayer(snakePlayer)
   }
 
+  async increaseScoreofSnakePlayer(snakePlayer : SnakePlayerEntity) {
+    snakePlayer.setScore(snakePlayer.getScore() + PointsPerFood)
+    await this.snakePlayerRepository.UpdateSnakePlayer(snakePlayer)
+  }
+
   async inserBodyOfSnakePlayer(lastSnakePiece: GameBoardPositionEntity,newPosition: GameBoardPositionEntity) {
     newPosition.setPlayerId(lastSnakePiece.getPlayerId())
-    newPosition.setBoardPositionType(lastSnakePiece.getBoardPositionType())
+    newPosition.setBoardPositionType(BoardPositionTypesList.Boody as BoardPositionType)
     newPosition.setSnakeBodyIdentifier(lastSnakePiece.getSnakeBodyIdentifier()+ 1)
     newPosition.setSnakeDirection(lastSnakePiece.getSnakeDirection())
-    console.log("newbodyu", newPosition)
     await this.boardPositionService.UpdateBoardPosition(newPosition)
   }
 

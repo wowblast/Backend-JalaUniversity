@@ -1,26 +1,26 @@
 import {Container} from 'inversify'
-import { IBoardPositionRepository } from "../coreIrepositories/boardPositionRepository";
+import { BoardPositionRepository } from "../coreIrepositories/boardPositionRepository";
 import { BoardPositionReposioryID, BoardPositionServiceID, GameRepositoryID, SnakeFoodServiceIdentifier, SnakePlayerRepositoryID, SnakePlayerServiceIdentifier } from '../types.ts/inversifyTypes';
-import BoardPositionRepository from "../../infrastruture/repositories/boardPositionRepository";
-import { ISnakePlayerRepository } from '../coreIrepositories/snakePlayeRepository';
-import SnakePlayerRepository from '../../infrastruture/repositories/snakePlayerRepositoryImplementation';
+import BoardPositionRepositoryImplementation from "../../infrastruture/repositories/boardPositionRepository";
+import { SnakePlayerRepository } from '../coreIrepositories/snakePlayeRepository';
+import SnakePlayerRepositoryImplementation from '../../infrastruture/repositories/snakePlayerRepositoryImplementation';
 import GameRepository from '../coreIrepositories/gameRepository';
 import GameRepositoryImplementation from '../../infrastruture/repositories/gameRepositoryImplementation';
-import { IBoardPositionService } from '../coreInterfaces/IBoardPositionService';
-import BoardPositionService from '../coreServices/boardPositionService';
+import { BoardPositionService } from '../coreInterfaces/BoardPositionService';
+import BoardPositionServiceImplementation from '../coreServices/boardPositionServiceImplementation';
 import { InitializateDatabaseConection } from '../../infrastruture/dataBaseController';
 import { SnakeFoodService } from '../coreInterfaces/SnakeFoodService';
 import SnakeFoodServiceImplementation from '../coreServices/snakeFoodServiceImplementation';
-import { ISnakePlayerService } from '../coreInterfaces/ISnakePlayerService';
-import SnakePlayerService from '../coreServices/snakePlayerService';
+import { SnakePlayerService } from '../coreInterfaces/SnakePlayerService';
+import SnakePlayerServiceImplementation from '../coreServices/snakePlayerServiceImplementation';
 
 const container = new  Container();
-container.bind<IBoardPositionRepository>(BoardPositionReposioryID).to(BoardPositionRepository)
-container.bind<ISnakePlayerRepository>(SnakePlayerRepositoryID).to(SnakePlayerRepository) 
+container.bind<BoardPositionRepository>(BoardPositionReposioryID).to(BoardPositionRepositoryImplementation)
+container.bind<SnakePlayerRepository>(SnakePlayerRepositoryID).to(SnakePlayerRepositoryImplementation) 
 container.bind<GameRepository>(GameRepositoryID).to(GameRepositoryImplementation)
-container.bind<IBoardPositionService>(BoardPositionServiceID).to(BoardPositionService)
+container.bind<BoardPositionService>(BoardPositionServiceID).to(BoardPositionServiceImplementation)
 container.bind<SnakeFoodService>(SnakeFoodServiceIdentifier).to(SnakeFoodServiceImplementation)
-container.bind<ISnakePlayerService>(SnakePlayerServiceIdentifier).to(SnakePlayerService)
+container.bind<SnakePlayerService>(SnakePlayerServiceIdentifier).to(SnakePlayerServiceImplementation)
 InitializateDatabaseConection()
 
 export { container }

@@ -4,6 +4,7 @@ import Database from "better-sqlite3";
 import BoardPosition from '../entities/gameBoardPosition';
 import SnakePlayer from '../entities/snakePlayer';
 import Game from '../entities/game';
+import SnakePlayerLeaderBoard from "../entities/snakePlayerLeaderBoard";
 export class TestHelper {
   private static _instance: TestHelper;
 
@@ -24,7 +25,7 @@ export class TestHelper {
       name: "default",
       type: "better-sqlite3",
       database: ":memory:",
-      entities: [BoardPosition, SnakePlayer, Game],
+      entities: [BoardPosition, SnakePlayer, Game, SnakePlayerLeaderBoard],
       synchronize: true,
     } as DataSourceOptions);
     await this.dbConnect.initialize()

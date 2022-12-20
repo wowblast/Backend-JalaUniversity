@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { container } from '../../applicationCore/config/inversify.config'
-import SnakePlayerService from '../../applicationCore/coreServices/snakePlayerService';
+import SnakePlayerService from '../../applicationCore/coreServices/snakePlayerServiceImplementation';
 import SnakePlayerEntity from '../../applicationCore/entities/snakePlayerEntity';
 
 
@@ -8,7 +8,6 @@ import SnakePlayerEntity from '../../applicationCore/entities/snakePlayerEntity'
 const snakePlayerService = container.resolve<SnakePlayerService>(SnakePlayerService)
 
 export const  createSnakePlayer = async  (req, res) => {
-    console.log("controller")
 		try {			
             const snakePlayer: SnakePlayerEntity = await snakePlayerService.CreateSnakePlayer(req.body.id, req.body.name, req.body.snakeDirection)
             //snakePlayerService.UpdateSnakePlayerDirecction

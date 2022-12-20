@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { SnakeFoodService } from '../coreInterfaces/SnakeFoodService';
 import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
 import { BoardPositionServiceID } from '../types.ts/inversifyTypes';
-import BoardPositionService from './boardPositionService';
+import BoardPositionService from './boardPositionServiceImplementation';
 
 @injectable()
 export default class SnakeFoodServiceImplementation implements SnakeFoodService {

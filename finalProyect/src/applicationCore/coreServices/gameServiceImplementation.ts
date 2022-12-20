@@ -1,21 +1,21 @@
 import { inject, injectable } from 'inversify';
-import { IGameService } from '../coreInterfaces/IGameService';
+import { GameService } from '../coreInterfaces/GameService';
 import GameEntity from '../entities/gameEntity';
-import { IBoardPositionService } from '../coreInterfaces/IBoardPositionService';
+import { BoardPositionService } from '../coreInterfaces/BoardPositionService';
 import { BoardPositionServiceID, GameRepositoryID, SnakePlayerServiceIdentifier } from '../types.ts/inversifyTypes';
 import GameRepository from '../coreIrepositories/gameRepository';
 import GameFactory from '../factories/gameFactory';
 import { DefaultGameID } from '../types.ts/gameConfigs';
-import { ISnakePlayerService } from '../coreInterfaces/ISnakePlayerService';
+import { SnakePlayerService } from '../coreInterfaces/SnakePlayerService';
 
 @injectable()
-export default class GameService implements IGameService {
+export default class GameServiceImplementation implements GameService {
 
-    private boardPositionService: IBoardPositionService
+    private boardPositionService: BoardPositionService
     private gameRepository: GameRepository
-    private snakePlayerService: ISnakePlayerService
-    constructor(@inject(BoardPositionServiceID)boardPositionService: IBoardPositionService,
-      @inject(GameRepositoryID) gameRepository:  GameRepository, @inject(SnakePlayerServiceIdentifier) snakePlayerService:ISnakePlayerService ) {
+    private snakePlayerService: SnakePlayerService
+    constructor(@inject(BoardPositionServiceID)boardPositionService: BoardPositionService,
+      @inject(GameRepositoryID) gameRepository:  GameRepository, @inject(SnakePlayerServiceIdentifier) snakePlayerService:SnakePlayerService ) {
         this.boardPositionService = boardPositionService
         this.gameRepository = gameRepository
         this.snakePlayerService =snakePlayerService
