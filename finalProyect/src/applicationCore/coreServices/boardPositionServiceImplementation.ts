@@ -43,8 +43,8 @@ export default class BoardPositionServiceImplementation implements BoardPosition
         return this.boardPositionRepository.GetBoardPointByPlayerIDAndPositionType(playerId, boardPositionType)
     }
 
-    async DeleteBoardPositionByPlayedId(playerId: number): Promise<void> {
-        return this.boardPositionRepository.ClearPointOnBoard(playerId)
+    async ClearBoardPositionByPositionId(positionId: number): Promise<void> {
+        return this.boardPositionRepository.ClearPointOnBoard(positionId)
     }
 
     async printBoardOnConsole() {

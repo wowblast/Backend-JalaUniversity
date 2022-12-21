@@ -19,7 +19,7 @@ export default class SnakeFoodServiceImplementation implements SnakeFoodService 
     }
     
     async RemoveFoodPointOnBoard(positionId: number): Promise<void> {
-        await this.boardPositionService.DeleteBoardPositionByPlayedId(positionId)        
+        await this.boardPositionService.ClearBoardPositionByPositionId(positionId)        
     }
 }
 
