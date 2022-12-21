@@ -1,19 +1,19 @@
-import { Column, Entity, PrimaryColumn } from "typeorm"
+import { Column, Entity, PrimaryColumn } from 'typeorm'
 
 @Entity()
 export default class SnakePlayer {
-    @PrimaryColumn()
+  @PrimaryColumn()
     playerId!: number
-    
-    @Column()
+
+  @Column()
     name: string
 
-    @Column()
+  @Column()
     snakeSize: number
 
-    @Column()
+  @Column()
     snakeDirection: string
 
-    @Column()
+  @Column()
     score: number
 }

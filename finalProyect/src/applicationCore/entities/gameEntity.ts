@@ -1,39 +1,39 @@
-import {  GameStatus } from '../types.ts/types';
-import Board from './board';
-export default class GameEntity extends Board{    
-    private gameStatus: GameStatus
-    private stepIntervalBySeconds: number
-    private id: number
-    constructor(
-        id: number, gameStatus: GameStatus, stepIntervalBySeconds: number, boardSize: number
-      ) {
-        super(boardSize)
-        this.id = id
-        this.stepIntervalBySeconds = stepIntervalBySeconds
-        this.gameStatus = gameStatus
-      }
+import { GameStatus } from '../types.ts/types'
+import Board from './board'
+export default class GameEntity extends Board {
+  private gameStatus: GameStatus
+  private stepIntervalBySeconds: number
+  private id: number
+  constructor (
+    id: number, gameStatus: GameStatus, stepIntervalBySeconds: number, boardSize: number
+  ) {
+    super(boardSize)
+    this.id = id
+    this.stepIntervalBySeconds = stepIntervalBySeconds
+    this.gameStatus = gameStatus
+  }
 
-    getId(): number {
-      return this.id
-    }
+  getId (): number {
+    return this.id
+  }
 
-    setId(id: number) {
-      this.id = id
-    }
-      getStatus() {
-        return this.gameStatus
-    }  
+  setId (id: number): void {
+    this.id = id
+  }
 
-    setStatus(gameStatus: GameStatus) {
-        this.gameStatus = gameStatus
-    }
+  getStatus (): GameStatus {
+    return this.gameStatus
+  }
 
-    getStepIntervalBySeconds() {
-      return this.stepIntervalBySeconds
-    }
+  setStatus (gameStatus: GameStatus): void {
+    this.gameStatus = gameStatus
+  }
 
-    setStepIntervalBySeconds(stepIntervalBySeconds: number) {
-      this.stepIntervalBySeconds = stepIntervalBySeconds
+  getStepIntervalBySeconds (): number {
+    return this.stepIntervalBySeconds
+  }
 
-    }
+  setStepIntervalBySeconds (stepIntervalBySeconds: number): void {
+    this.stepIntervalBySeconds = stepIntervalBySeconds
+  }
 }

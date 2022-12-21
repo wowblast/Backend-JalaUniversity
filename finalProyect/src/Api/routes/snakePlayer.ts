@@ -1,12 +1,13 @@
-import { Router } from 'express';
-import { createSnakePlayer, moveSnakeForwards, updateSnakePlayerDirecction, updateSnakePlayerName } from '../controllers/snakePlayerController';
+/* eslint-disable @typescript-eslint/no-misused-promises */
 
-const routes = Router();
+import { Router } from 'express'
+import { createSnakePlayer, moveSnakeForwards, updateSnakePlayerDirecction, updateSnakePlayerName } from '../controllers/snakePlayerController'
 
-routes.post('/createSnakePlayer', createSnakePlayer);
-routes.put('/updateSnakePlayerDirecction', updateSnakePlayerDirecction);
-routes.put('/updateSnakePlayerName', updateSnakePlayerName);
-routes.put('/moveSnakeForwards', moveSnakeForwards);
+const routes = Router()
 
+routes.post('/createSnakePlayer', createSnakePlayer)
+routes.put('/updateSnakePlayerDirecction', updateSnakePlayerDirecction)
+routes.put('/updateSnakePlayerName', updateSnakePlayerName)
+routes.put('/moveSnakeForwards', moveSnakeForwards)
 
-export default routes;
+export default routes

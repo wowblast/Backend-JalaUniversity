@@ -1,13 +1,12 @@
-import { Router } from 'express';
-import { createGame, startGameAuto, stopGameAuto } from '../controllers/gameController';
+/* eslint-disable @typescript-eslint/no-misused-promises */
 
-const routes = Router();
+import { Router } from 'express'
+import { createGame, startGameAuto, stopGameAuto } from '../controllers/gameController'
 
-routes.post('/createGame', createGame);
-routes.post('/startGameAuto', startGameAuto);
-routes.post('/stopGameAuto', stopGameAuto);
+const routes = Router()
 
+routes.post('/createGame', createGame)
+routes.post('/startGameAuto', startGameAuto)
+routes.post('/stopGameAuto', stopGameAuto)
 
-
-
-export default routes;
+export default routes

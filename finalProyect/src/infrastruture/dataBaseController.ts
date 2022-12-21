@@ -1,9 +1,9 @@
-import { AppDataSource } from "./data-source";
+import { AppDataSource } from './data-source'
 
-export async function InitializateDatabaseConection() {
-    await AppDataSource.initialize();
+export async function InitializateDatabaseConection (): Promise<void> {
+  await AppDataSource.initialize()
 }
 
-export async function CloseDatabaseConection() {
-    await AppDataSource.destroy();
+export async function CloseDatabaseConection (): Promise<void> {
+  await AppDataSource.destroy()
 }

@@ -1,10 +1,11 @@
-import {clearBoard, createBoard, getBoardPositions} from '../controllers/boardPositionController'
-import { Router } from 'express';
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import { clearBoard, createBoard, getBoardPositions } from '../controllers/boardPositionController'
+import { Router } from 'express'
 
-const routes = Router();
+const routes = Router()
 
-routes.get('/getBoardPositions', getBoardPositions);
-routes.post('/createBoard', createBoard);
-routes.post('/clearBoard', clearBoard);
+routes.get('/getBoardPositions', getBoardPositions)
+routes.post('/createBoard', createBoard)
+routes.post('/clearBoard', clearBoard)
 
-export default routes;
+export default routes
