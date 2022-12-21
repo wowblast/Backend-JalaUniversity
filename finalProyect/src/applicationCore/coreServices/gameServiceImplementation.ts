@@ -31,15 +31,17 @@ export default class GameServiceImplementation implements GameService {
 
     }
     async GetGameStatus(): Promise<GameEntity> {
-        return
+        return await this.gameRepository.GetGameInstance(DefaultGameID)
+    }
+    async EndGame(): Promise<void> {
+         await this.gameRepository.DeleteGameInstance(DefaultGameID)
 
     }
-    async EndGame(): Promise<GameEntity> {
-        return
-
-    }
-    async RestartGame(): Promise<GameEntity> {
-        return
+    async RestartGame(): Promise<void> {
+        const gameInstance: GameEntity = await this.gameRepository.GetGameInstance(1)
+        const boardSize = gameInstance.getBoardSize()
+        await this.boardPositionService.CreateBoard(boardSize)
+        await this.updateGamestatus('Ready')
     }
 
     async createFoodOnBoard(): Promise<void> {
@@ -59,7 +61,7 @@ export default class GameServiceImplementation implements GameService {
             await this.delay(1000)
         
             await this.updateGamestatus('Playing')
-            snakeHeads.forEach(async (snake) => {
+            await snakeHeads.forEach(async (snake) => {
                 await this.snakePlayerService.MoveSnakeForward(snake.getPlayerId(), snake.getSnakeDirection())
 
             })
@@ -75,6 +77,7 @@ export default class GameServiceImplementation implements GameService {
     }
     async StopAutoMovemenvent(): Promise<void> {
         clearInterval(this.intervalIdentifier)
+        await this.EndGame()
     }
 
     delay(ms: number) {
@@ -86,5 +89,4 @@ export default class GameServiceImplementation implements GameService {
         gameInstance.setStatus(status)
         await this.gameRepository.UpdateGameInstance(gameInstance)
     }
-
 }

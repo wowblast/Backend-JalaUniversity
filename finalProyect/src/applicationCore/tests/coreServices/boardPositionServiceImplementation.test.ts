@@ -3,15 +3,10 @@ import { TestHelper } from "../testhelper";
 import GameBoardPositionEntity from '../../../applicationCore/entities/gameBoardPositionEntity';
 import BoardPositionServiceImplementation from '../../coreServices/boardPositionServiceImplementation';
 import BoardPositionRepositoryImplementation from '../../../infrastruture/repositories/boardPositionRepository';
-import GameRepositoryImplementation from '../../../infrastruture/repositories/gameRepositoryImplementation';
-import SnakePlayerLeaderBoardRepositoryImplementation from '../../../infrastruture/repositories/snakePlayerLeaderBoardRepositoryImplementation';
-import SnakePlayerRepositoryImplementation from '../../../infrastruture/repositories/snakePlayerRepositoryImplementation';
 import { Repository } from 'typeorm';
 
 const  boardPositionRepository: BoardPositionRepositoryImplementation = new BoardPositionRepositoryImplementation()
-const  gameRepositoryImplementation: GameRepositoryImplementation = new GameRepositoryImplementation()
-const  snakePlayerLeaderBoardRepositoryImplementation: SnakePlayerLeaderBoardRepositoryImplementation = new SnakePlayerLeaderBoardRepositoryImplementation()
-const  snakePlayerRepositoryImplementation: SnakePlayerRepositoryImplementation = new SnakePlayerRepositoryImplementation()
+
 
 let  boardPositionServiceImplementation: BoardPositionServiceImplementation
 let repository:Repository<BoardPosition>
