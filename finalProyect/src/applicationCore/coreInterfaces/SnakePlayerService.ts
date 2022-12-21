@@ -5,4 +5,5 @@ export interface SnakePlayerService {
     UpdateSnakePlayerName(id: number, name: string): Promise<SnakePlayerEntity> 
     MoveSnakeForward(id: number,snakeDirection: string): Promise<Boolean>
     InsertSnakeFoodOnBoard(): Promise<void>
+    PrintBoardOnConsole(): Promise<void>
 }

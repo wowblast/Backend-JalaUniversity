@@ -15,7 +15,6 @@ export default class BoardPositionServiceImplementation implements BoardPosition
     }
 
     async GetAllPositions(): Promise<GameBoardPositionEntity[]> {   
-        await this.printBoardOnConsole()     
         return  await this.boardPositionRepository.GetAllPositions()
     }
     async ClearBoard(): Promise<void> {
@@ -60,5 +59,9 @@ export default class BoardPositionServiceImplementation implements BoardPosition
                 console.log()            
             }
       }
+
+    async GetAllSnakeHeads(): Promise<GameBoardPositionEntity[]> {
+    return await this.boardPositionRepository.GetAllSnakeHeads();
+    }
 
 }

@@ -6,3 +6,4 @@ export const DefaultFoodID = 0;
 export const DefaultGameID = 1;
 export const DefaultSnakeBodyIdentifier = 0
 export const DefaultNextPointBoardDirection = '-'
+export const DefaultTopScores = 3

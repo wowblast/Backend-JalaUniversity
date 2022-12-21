@@ -1,6 +1,4 @@
-
-
-export interface SnakePositionRepository {
+export interface GameMovementService {
     StartAutoMovemenvent(): Promise<void>
     StopAutoMovemenvent(): Promise<void>   
 }

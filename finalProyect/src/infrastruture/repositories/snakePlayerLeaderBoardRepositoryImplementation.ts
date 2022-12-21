@@ -5,6 +5,9 @@ import { SnakePlayerLeaderBoardRepository } from '../../applicationCore/coreIrep
 import { AppDataSource } from '../data-source';
 import SnakePlayerLeaderBoard from '../entities/snakePlayerLeaderBoard';
 import SnakePlayerLeaderBoardMapper from '../mappers/snakePlayerLeaderBoardMapper';
+import { injectable } from 'inversify';
+
+@injectable()
 export default class SnakePlayerLeaderBoardRepositoryImplementation implements SnakePlayerLeaderBoardRepository {
 
     private repository: Repository<SnakePlayerLeaderBoard>

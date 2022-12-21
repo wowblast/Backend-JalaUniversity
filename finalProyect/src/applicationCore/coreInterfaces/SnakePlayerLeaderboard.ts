@@ -2,7 +2,7 @@ import SnakePlayerEntity from '../entities/snakePlayerEntity';
 import SnakePlayerLeaderBoardEntity from '../entities/snakePlayerLeaderboardEntity';
 
 export interface SnakePlayerLeaderBoardService {
-    InsertSnakePlayerOnLeaderBoard(snakePlayer: SnakePlayerEntity): Promise<void>
-    RemoveSnakePlayerFromLeaderBoard(snakePlayer: SnakePlayerEntity): Promise<void> 
+    InsertSnakePlayerOnLeaderBoardIfTopScore(snakePlayer: SnakePlayerEntity): Promise<void>
+    RemoveSnakePlayerFromLeaderBoard(snakePlayer: SnakePlayerLeaderBoardEntity): Promise<void> 
     GetSnakePlayerLeaderBoard(): Promise<SnakePlayerLeaderBoardEntity[]>
 }

@@ -7,4 +7,5 @@ export interface BoardPositionService {
     UpdateBoardPosition(gameBoardPositionEntity :GameBoardPositionEntity): Promise<GameBoardPositionEntity>
     GetBoardPositionByPlayedId(playerId: number): Promise<GameBoardPositionEntity[]>
     DeleteBoardPositionByPlayedId(playerId: number): Promise<void>
+    GetAllSnakeHeads(): Promise<GameBoardPositionEntity[]>
 }

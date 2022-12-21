@@ -42,6 +42,13 @@ export default class BoardPositionRepositoryImplementation implements BoardPosit
 
         return gameBoardPosition
     }
+
+    async GetAllSnakeHeads(): Promise<GameBoardPositionEntity[]> {
+        // 
+         const points =await this.repository.findBy({positionType: 'head'})
+         const gameBoardPosition:GameBoardPositionEntity[]  = points.map(GameBoardPositionMapper.castToDomainEntitiy) 
+         return gameBoardPosition
+     }
     async ClearBoard(): Promise<void> {
         
         await this.repository.clear()

@@ -12,3 +12,23 @@ export const  createGame = async  (req, res) => {
 		res.status(500).send(err)
 		}
 	}
+
+export const startGameAuto = async  (req, res) => {
+	try {			
+		await gameService.StartAutoMovemenvent()
+		res.json({"game": "started"})
+	}
+	catch (err) {
+	res.status(500).send(err)
+	}
+}
+
+export const stopGameAuto = async  (req, res) => {
+	try {			
+		await gameService.StopAutoMovemenvent()
+		res.json({"game": "stopped"})
+	}
+	catch (err) {
+	res.status(500).send(err)
+	}
+}

@@ -2,6 +2,7 @@ import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
 import { BoardPositionType } from '../types.ts/types';
 
 export interface BoardPositionRepository {
+     GetAllSnakeHeads(): Promise<GameBoardPositionEntity[]>
      CreateBoard(size: number): Promise<GameBoardPositionEntity[]>    
      GetAllPositions(): Promise<GameBoardPositionEntity[]> 
      ClearBoard(): Promise<void>

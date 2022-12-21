@@ -4,4 +4,6 @@ export interface GameService {
     GetGameStatus(): Promise<GameEntity>
     EndGame(): Promise<GameEntity>
     RestartGame(): Promise<GameEntity>
+    StartAutoMovemenvent(): Promise<void>
+    StopAutoMovemenvent(): Promise<void>   
 }
