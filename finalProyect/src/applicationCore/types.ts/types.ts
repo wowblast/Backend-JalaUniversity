@@ -5,13 +5,13 @@ export const GameStatusStates = {
   ReadyState: 'Ready',
   Playing: 'Playing',
   EndState: 'Ended'
-}
+};
 export const BoardPositionTypesList = {
   Head: 'head',
   Boody: 'body',
   Food: 'food',
   Empty: 'empty'
-}
+};
 
 export const SnakeDirectionsList = {
   UP: 'UP',
@@ -19,11 +19,11 @@ export const SnakeDirectionsList = {
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
   DEFAULT: '-'
-}
+};
 
 export const OpositeSnakeDirectionsList = {
   UP: 'DOWN',
   DOWN: 'UP',
   LEFT: 'RIGHT',
   RIGHT: 'LEFT'
-}
+};

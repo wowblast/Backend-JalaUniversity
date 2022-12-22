@@ -1,64 +1,64 @@
-import { inject, injectable } from 'inversify'
-import { BoardPositionService } from '../coreInterfaces/BoardPositionService'
-import { BoardPositionReposioryID } from '../types.ts/inversifyTypes'
-import { BoardPositionRepository } from '../coreIrepositories/boardPositionRepository'
-import GameBoardPositionEntity from '../entities/gameBoardPositionEntity'
-import { BoardPositionType } from '../types.ts/types'
+import { inject, injectable } from 'inversify';
+import { BoardPositionService } from '../coreInterfaces/BoardPositionService';
+import { BoardPositionReposioryID } from '../types.ts/inversifyTypes';
+import { BoardPositionRepository } from '../coreIrepositories/boardPositionRepository';
+import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
+import { BoardPositionType } from '../types.ts/types';
 
 @injectable()
 export default class BoardPositionServiceImplementation implements BoardPositionService {
-  private readonly boardPositionRepository: BoardPositionRepository
+  private readonly boardPositionRepository: BoardPositionRepository;
   constructor (@inject(BoardPositionReposioryID) boardPositionRepository: BoardPositionRepository) {
-    this.boardPositionRepository = boardPositionRepository
+    this.boardPositionRepository = boardPositionRepository;
   }
 
   async GetAllPositions (): Promise<GameBoardPositionEntity[]> {
-    return await this.boardPositionRepository.GetAllPositions()
+    return await this.boardPositionRepository.GetAllPositions();
   }
 
   async ClearBoard (): Promise<void> {
-    await this.boardPositionRepository.ClearBoard()
+    await this.boardPositionRepository.ClearBoard();
   }
 
   async CreateBoard (boardSize: number): Promise<GameBoardPositionEntity[]> {
-    return await this.boardPositionRepository.CreateBoard(boardSize)
+    return await this.boardPositionRepository.CreateBoard(boardSize);
   }
 
   async GetBoardPositionByPosition (xPosition: number, yPosition: number): Promise<GameBoardPositionEntity> {
-    return await this.boardPositionRepository.GetPointOnBoard(xPosition, yPosition)
+    return await this.boardPositionRepository.GetPointOnBoard(xPosition, yPosition);
   }
 
   async UpdateBoardPosition (gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity> {
-    await this.boardPositionRepository.UpdatePointOnBoard(gameBoardPositionEntity)
-    return gameBoardPositionEntity
+    await this.boardPositionRepository.UpdatePointOnBoard(gameBoardPositionEntity);
+    return gameBoardPositionEntity;
   }
 
   async GetBoardPositionByPlayedId (playerId: number): Promise<GameBoardPositionEntity[]> {
-    return await this.boardPositionRepository.GetBoardPointsByPlayerID(playerId)
+    return await this.boardPositionRepository.GetBoardPointsByPlayerID(playerId);
   }
 
   async GetBoardPointByPlayerIDAndPositionType (playerId: number, boardPositionType: BoardPositionType): Promise<GameBoardPositionEntity> {
-    return await this.boardPositionRepository.GetBoardPointByPlayerIDAndPositionType(playerId, boardPositionType)
+    return await this.boardPositionRepository.GetBoardPointByPlayerIDAndPositionType(playerId, boardPositionType);
   }
 
   async ClearBoardPositionByPositionId (positionId: number): Promise<void> {
-    return await this.boardPositionRepository.ClearPointOnBoard(positionId)
+    return await this.boardPositionRepository.ClearPointOnBoard(positionId);
   }
 
   async printBoardOnConsole (): Promise<void> {
-    const allPositions = await this.boardPositionRepository.GetAllPositions()
-    let pos = allPositions[0]
-    console.log()
+    const allPositions = await this.boardPositionRepository.GetAllPositions();
+    let pos = allPositions[0];
+    console.log();
     for (let x = 4; x >= 0; x--) {
       for (let y = 0; y < 5; y++) {
-        pos = allPositions.filter((poss) => poss.getXPosition() === y && poss.getYPosition() === x)[0]
-        process.stdout.write('[' + pos.getPlayerId().toString() + '] ')
+        pos = allPositions.filter((poss) => poss.getXPosition() === y && poss.getYPosition() === x)[0];
+        process.stdout.write('[' + pos.getPlayerId().toString() + '] ');
       }
-      console.log()
+      console.log();
     }
   }
 
   async GetAllSnakeHeads (): Promise<GameBoardPositionEntity[]> {
-    return await this.boardPositionRepository.GetAllSnakeHeads()
+    return await this.boardPositionRepository.GetAllSnakeHeads();
   }
 }

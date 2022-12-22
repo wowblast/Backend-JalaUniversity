@@ -1,4 +1,4 @@
-import SnakePlayerEntity from '../entities/snakePlayerEntity'
+import SnakePlayerEntity from '../entities/snakePlayerEntity';
 
 export interface SnakePlayerRepository {
   InsertSnakePlayer: (snakePlayerEntity: SnakePlayerEntity) => Promise<void>

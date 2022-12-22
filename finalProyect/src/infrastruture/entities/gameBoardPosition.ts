@@ -1,25 +1,25 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export default class GameBoardPosition {
   @PrimaryColumn()
-    id!: number
+    id!: number;
 
   @Column()
-    xPosition: number
+    xPosition: number;
 
   @Column()
-    yPosition: number
+    yPosition: number;
 
   @Column()
-    positionType: string
+    positionType: string;
 
   @Column()
-    playerId: number
+    playerId: number;
 
   @Column()
-    snakeBodyIndentifier: number
+    snakeBodyIndentifier: number;
 
   @Column()
-    snakeDirection: string
+    snakeDirection: string;
 }

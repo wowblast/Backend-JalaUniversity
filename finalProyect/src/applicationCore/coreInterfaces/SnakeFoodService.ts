@@ -1,4 +1,4 @@
-import GameBoardPositionEntity from '../entities/gameBoardPositionEntity'
+import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
 
 export interface SnakeFoodService {
   InsertFoodPointOnBoard: (gameBoardPositionEntity: GameBoardPositionEntity) => Promise<void>

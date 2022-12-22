@@ -1,5 +1,5 @@
-import SnakePlayerEntity from '../entities/snakePlayerEntity'
-import SnakePlayerLeaderBoardEntity from '../entities/snakePlayerLeaderboardEntity'
+import SnakePlayerEntity from '../entities/snakePlayerEntity';
+import SnakePlayerLeaderBoardEntity from '../entities/snakePlayerLeaderboardEntity';
 
 export interface SnakePlayerLeaderBoardRepository {
   InsertSnakePlayerOnLeaderBoard: (snakePlayer: SnakePlayerEntity) => Promise<void>

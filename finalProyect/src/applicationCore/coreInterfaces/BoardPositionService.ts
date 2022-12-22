@@ -1,4 +1,4 @@
-import GameBoardPositionEntity from '../entities/gameBoardPositionEntity'
+import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
 export interface BoardPositionService {
   GetAllPositions: () => Promise<GameBoardPositionEntity[]>
   ClearBoard: () => Promise<void>

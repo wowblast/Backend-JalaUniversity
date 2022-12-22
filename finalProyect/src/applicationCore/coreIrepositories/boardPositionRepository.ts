@@ -1,5 +1,5 @@
-import GameBoardPositionEntity from '../entities/gameBoardPositionEntity'
-import { BoardPositionType } from '../types.ts/types'
+import GameBoardPositionEntity from '../entities/gameBoardPositionEntity';
+import { BoardPositionType } from '../types.ts/types';
 
 export interface BoardPositionRepository {
   GetAllSnakeHeads: () => Promise<GameBoardPositionEntity[]>

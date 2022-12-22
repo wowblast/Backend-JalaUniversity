@@ -1,4 +1,4 @@
-import GameEntity from '../entities/gameEntity'
+import GameEntity from '../entities/gameEntity';
 export interface GameService {
   CreateGame: (boardSize: number, interval: number) => Promise<void>
   GetGameStatus: () => Promise<GameEntity>

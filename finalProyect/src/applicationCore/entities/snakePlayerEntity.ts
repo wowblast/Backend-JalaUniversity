@@ -1,56 +1,56 @@
-import { SnakeDirection } from '../types.ts/types'
+import { SnakeDirection } from '../types.ts/types';
 
 export default class SnakePlayerEntity {
-  private playerId: number
-  private name: string
-  private snakeDirection: SnakeDirection
-  private score: number
-  private snakeSize: number
+  private playerId: number;
+  private name: string;
+  private snakeDirection: SnakeDirection;
+  private score: number;
+  private snakeSize: number;
   constructor (playerId: number, name: string, snakeDirection: SnakeDirection, score: number, snakeSize: number) {
-    this.playerId = playerId
-    this.name = name
-    this.snakeDirection = snakeDirection
-    this.score = score
-    this.snakeSize = snakeSize
+    this.playerId = playerId;
+    this.name = name;
+    this.snakeDirection = snakeDirection;
+    this.score = score;
+    this.snakeSize = snakeSize;
   }
 
   getPLayerId (): number {
-    return this.playerId
+    return this.playerId;
   }
 
   setPlayerId (playerId: number): void {
-    this.playerId = playerId
+    this.playerId = playerId;
   }
 
   getName (): string {
-    return this.name
+    return this.name;
   }
 
   setName (name: string): void {
-    this.name = name
+    this.name = name;
   }
 
   getSnakeDirection (): SnakeDirection {
-    return this.snakeDirection
+    return this.snakeDirection;
   }
 
   setSnakeDirection (snakeDirection: SnakeDirection): void {
-    this.snakeDirection = snakeDirection
+    this.snakeDirection = snakeDirection;
   }
 
   getScore (): number {
-    return this.score
+    return this.score;
   }
 
   setScore (score: number): void {
-    this.score = score
+    this.score = score;
   }
 
   getSnakeSize (): number {
-    return this.snakeSize
+    return this.snakeSize;
   }
 
   setSnakeSize (snakeSize: number): void {
-    this.snakeSize = snakeSize
+    this.snakeSize = snakeSize;
   }
 }

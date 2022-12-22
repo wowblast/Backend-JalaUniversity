@@ -1,16 +1,16 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export default class Game {
   @PrimaryColumn()
-    id!: number
+    id!: number;
 
   @Column()
-    status: string
+    status: string;
 
   @Column()
-    boardSize: number
+    boardSize: number;
 
   @Column()
-    stepIntervalBySeconds: number
+    stepIntervalBySeconds: number;
 }
