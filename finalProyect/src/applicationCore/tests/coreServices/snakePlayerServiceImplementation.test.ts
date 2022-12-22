@@ -5,7 +5,6 @@ import BoardPositionRepositoryImplementation from '../../../infrastruture/reposi
 import GameRepositoryImplementation from '../../../infrastruture/repositories/gameRepositoryImplementation'
 import SnakePlayerLeaderBoardRepositoryImplementation from '../../../infrastruture/repositories/snakePlayerLeaderBoardRepositoryImplementation'
 import SnakePlayerRepositoryImplementation from '../../../infrastruture/repositories/snakePlayerRepositoryImplementation'
-import { Repository } from 'typeorm'
 import GameServiceImplementation from '../../coreServices/gameServiceImplementation'
 import SnakePlayerServiceImplementation from '../../coreServices/snakePlayerServiceImplementation'
 import Game from '../../../infrastruture/entities/game'
@@ -13,9 +12,9 @@ import SnakePlayerLeaderBoard from '../../../infrastruture/entities/snakePlayerL
 import SnakePlayer from '../../../infrastruture/entities/snakePlayer'
 import SnakeFoodServiceImplementation from '../../coreServices/snakeFoodServiceImplementation'
 import SnakePlayerLeaderBoardServiceImplementation from '../../coreServices/snakePlayerLeaderBoardServiceImplementation'
-import { DefaultGameID } from '../../types.ts/gameConfigs'
-import GameEntity from '../../entities/gameEntity'
-import { GameStatusStates } from '../../../applicationCore/types.ts/types'
+
+import GameBoardPositionEntity from '../../entities/gameBoardPositionEntity'
+import SnakePlayerEntity from '../../entities/snakePlayerEntity'
 
 const boardPositionRepository: BoardPositionRepositoryImplementation = new BoardPositionRepositoryImplementation()
 const gameRepositoryImplementation: GameRepositoryImplementation = new GameRepositoryImplementation()
@@ -26,12 +25,9 @@ let gameServiceImplementation: GameServiceImplementation
 let snakePlayerServiceImplementation: SnakePlayerServiceImplementation
 let snakeFoodServiceImplementation: SnakeFoodServiceImplementation
 let snakePlayerLeaderBoardServiceImplementation: SnakePlayerLeaderBoardServiceImplementation
-let repository: Repository<Game>
-// let boardRepository: Repository<BoardPosition>
 
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB()
-  repository = TestHelper.instance.getDatasource().getRepository(Game)
   boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getRepository(BoardPosition))
   gameRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(Game))
   snakePlayerLeaderBoardRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(SnakePlayerLeaderBoard))
@@ -56,7 +52,7 @@ afterAll(async () => {
   await TestHelper.instance.teardownTestDB()
 })
 
-describe('Game Service Implementation', () => {
+describe('Snake player service Implementation', () => {
   const boardPosition = new BoardPosition()
   const playerID = 3
 
@@ -68,54 +64,28 @@ describe('Game Service Implementation', () => {
   boardPosition.xPosition = 0
   boardPosition.yPosition = 0
 
-  test('should create a game', async () => {
-    const boardSize = 3
-    await gameServiceImplementation.CreateGame(boardSize, 5)
-    const results = await repository.find()
-    expect(results.length).toBe(1)
-    expect(results[0].id).toBe(1)
+  test('should insert a snakePlayer and get snake head', async () => {
+    await gameServiceImplementation.CreateGame(5, 5)
+    await snakePlayerServiceImplementation.CreateSnakePlayer(2, 'test', 'UP')
+    const snakeHead: GameBoardPositionEntity = await snakePlayerServiceImplementation.getSnakeHead(2)
+    expect(snakeHead.getPlayerId()).toBe(2)
   })
 
-  test('should get game instance', async () => {
-    const boardSize = 3
-    await gameServiceImplementation.CreateGame(boardSize, 5)
-    const gameInstance: GameEntity = await gameServiceImplementation.GetGameStatus()
-    expect(gameInstance.getId()).toBe(DefaultGameID)
-    expect(gameInstance.getStatus()).toBe(GameStatusStates.ReadyState)
+  test('should move snake player', async () => {
+    await gameServiceImplementation.CreateGame(3, 5)
+    await snakePlayerServiceImplementation.CreateSnakePlayer(2, 'test', 'UP')
+    const boardBeforeMovement: GameBoardPositionEntity = await snakePlayerServiceImplementation.getSnakeHead(2)
+    await snakePlayerServiceImplementation.getSnakeHead(2)
+    await snakePlayerServiceImplementation.MoveSnakeForward(2, 'UP')
+    const afterMovement: GameBoardPositionEntity = await snakePlayerServiceImplementation.getSnakeHead(2)
+
+    expect(boardBeforeMovement).not.toEqual(afterMovement)
   })
 
-  test('should update game status to playing state', async () => {
-    const boardSize = 3
-    await gameServiceImplementation.CreateGame(boardSize, 5)
-    await gameServiceImplementation.updateGamestatus('Playing')
-    const gameInstance: GameEntity = await gameServiceImplementation.GetGameStatus()
-    expect(gameInstance.getId()).toBe(DefaultGameID)
-    expect(gameInstance.getStatus()).toBe(GameStatusStates.Playing)
-  })
-
-  test('delay 1 seconds function', async () => {
-    jest.useFakeTimers()
-    jest.spyOn(global, 'setTimeout')
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    gameServiceImplementation.delay(1)
-    expect(setTimeout).toHaveBeenCalledTimes(1)
-  })
-
-  test('should end  game and delete game instance', async () => {
-    const boardSize = 3
-    await gameServiceImplementation.CreateGame(boardSize, 5)
-    await gameServiceImplementation.EndGame()
-    const results = await repository.find()
-
-    expect(results.length).toBe(0)
-  })
-
-  test('should restart the game and create new board', async () => {
-    const boardSize = 3
-    await gameServiceImplementation.CreateGame(boardSize, 5)
-    await gameServiceImplementation.updateGamestatus('Ended')
-    await gameServiceImplementation.RestartGame()
-    const gameInstance = await gameServiceImplementation.GetGameStatus()
-    expect(gameInstance.getStatus()).toBe('Ready')
+  test('should move snake player', async () => {
+    await gameServiceImplementation.CreateGame(3, 5)
+    await snakePlayerServiceImplementation.CreateSnakePlayer(2, 'test', 'UP')
+    const snakePlayer: SnakePlayerEntity = await snakePlayerServiceImplementation.UpdateSnakePlayerDirecction(2, 'DOWN')
+    expect(snakePlayer.getSnakeDirection()).toEqual('DOWN')
   })
 })
