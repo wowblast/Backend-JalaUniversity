@@ -87,4 +87,13 @@ describe('boardPosition Repository', () => {
     const results: GameBoardPositionEntity[] = await boardPositionRepository.GetAllPositions();
     expect(results.length).toBe(4);
   });
+
+  test('should get snake heads', async () => {
+    const boardSize = 2;
+    await boardPositionRepository.CreateBoard(boardSize);
+    const position = new GameBoardPositionEntity(5, 1, 0, 'head', 0, 0, 'UP');
+    await boardPositionRepository.UpdatePointOnBoard(position);
+    const results: GameBoardPositionEntity[] = await boardPositionRepository.GetAllSnakeHeads();
+    expect(results.length).toBe(1);
+  });
 });

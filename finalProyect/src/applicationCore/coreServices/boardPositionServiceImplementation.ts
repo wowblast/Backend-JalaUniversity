@@ -45,19 +45,6 @@ export default class BoardPositionServiceImplementation implements BoardPosition
     return await this.boardPositionRepository.ClearPointOnBoard(positionId);
   }
 
-  async printBoardOnConsole (): Promise<void> {
-    const allPositions = await this.boardPositionRepository.GetAllPositions();
-    let pos = allPositions[0];
-    console.log();
-    for (let x = 4; x >= 0; x--) {
-      for (let y = 0; y < 5; y++) {
-        pos = allPositions.filter((poss) => poss.getXPosition() === y && poss.getYPosition() === x)[0];
-        process.stdout.write('[' + pos.getPlayerId().toString() + '] ');
-      }
-      console.log();
-    }
-  }
-
   async GetAllSnakeHeads (): Promise<GameBoardPositionEntity[]> {
     return await this.boardPositionRepository.GetAllSnakeHeads();
   }

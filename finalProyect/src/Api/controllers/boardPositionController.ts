@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { container } from '../../applicationCore/config/inversify.config';
 import GameBoardPositionEntity from '../../applicationCore/entities/gameBoardPositionEntity';
 import BoardPositionService from '../../applicationCore/coreServices/boardPositionServiceImplementation';

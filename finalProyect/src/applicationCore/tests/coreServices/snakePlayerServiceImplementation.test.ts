@@ -88,4 +88,35 @@ describe('Snake player service Implementation', () => {
     const snakePlayer: SnakePlayerEntity = await snakePlayerServiceImplementation.UpdateSnakePlayerDirecction(2, 'DOWN');
     expect(snakePlayer.getSnakeDirection()).toEqual('DOWN');
   });
+
+  test('should update  snake player name ', async () => {
+    await gameServiceImplementation.CreateGame(3, 5);
+    await snakePlayerServiceImplementation.CreateSnakePlayer(2, 'test', 'UP');
+    const snakePlayer: SnakePlayerEntity = await snakePlayerServiceImplementation.UpdateSnakePlayerName(2, 'new name');
+    expect(snakePlayer.getName()).toEqual('new name');
+  });
+
+  test('should not update  snake player direction if status games is not ready ', async () => {
+    await gameServiceImplementation.CreateGame(3, 5);
+    await gameServiceImplementation.updateGamestatus('Playing');
+    await snakePlayerServiceImplementation.CreateSnakePlayer(2, 'test', 'UP');
+    const snakePlayer: SnakePlayerEntity = await snakePlayerServiceImplementation.UpdateSnakePlayerDirecction(2, 'DOWN');
+    expect(snakePlayer.getSnakeDirection()).toEqual('UP');
+  });
+
+  test('should get next position given a position and direction ', async () => {
+    await gameServiceImplementation.CreateGame(3, 5);
+    await snakePlayerServiceImplementation.CreateSnakePlayer(2, 'test', 'UP');
+    const point: GameBoardPositionEntity = await boardPositionServiceImplementation.GetBoardPositionByPosition(0,0);
+    const nextLeftPosition = await snakePlayerServiceImplementation.getNextPosition(point,'LEFT');
+    const nextRightPosition = await snakePlayerServiceImplementation.getNextPosition(point,'RIGHT');
+    const nextUpPosition = await snakePlayerServiceImplementation.getNextPosition(point,'UP');
+    const nextDownPosition = await snakePlayerServiceImplementation.getNextPosition(point,'DOWN');
+
+    expect([nextLeftPosition.getXPosition(), nextLeftPosition.getYPosition()]).toEqual([2,0]);
+    expect([nextRightPosition.getXPosition(), nextRightPosition.getYPosition()]).toEqual([1,0]);
+    expect([nextUpPosition.getXPosition(), nextUpPosition.getYPosition()]).toEqual([0,1]);
+    expect([nextDownPosition.getXPosition(), nextDownPosition.getYPosition()]).toEqual([0,2]);
+
+  });
 });

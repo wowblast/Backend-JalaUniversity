@@ -17,8 +17,8 @@ export const createSnakePlayer = async (req, res): Promise<void> => {
 
 export const updateSnakePlayerDirecction = async (req, res): Promise<void> => {
   try {
-    await snakePlayerService.UpdateSnakePlayerDirecction(req.body.id, req.body.snakeDirection);
-    res.json({ updated: req.body.snakeDirection });
+    const snakePlayer: SnakePlayerEntity = await snakePlayerService.UpdateSnakePlayerDirecction(req.body.id, req.body.snakeDirection);
+    res.json({ updated: snakePlayer.getSnakeDirection() ===req.body.snakeDirection });
   } catch (err) {
     res.status(500).send(err);
   }

@@ -35,7 +35,7 @@ export default class GameServiceImplementation implements GameService {
   }
 
   async EndGame (): Promise<void> {
-    await this.gameRepository.DeleteGameInstance(DefaultGameID);
+    await this.updateGamestatus('Ended');
   }
 
   async RestartGame (): Promise<void> {
@@ -59,17 +59,15 @@ export default class GameServiceImplementation implements GameService {
     this.intervalIdentifier = setInterval(async () => {
       const snakeHeads: GameBoardPositionEntity[] = await this.boardPositionService.GetAllSnakeHeads();
       console.log('Playing');
-      await this.delay(1000);
-
       await this.updateGamestatus('Playing');
       for (let index = 0; index < snakeHeads.length; index++) {
-        await this.snakePlayerService.MoveSnakeForward(snakeHeads[index].getPlayerId(), snakeHeads[index].getSnakeDirection());
+        const isMoved = await this.snakePlayerService.MoveSnakeForward(snakeHeads[index].getPlayerId(), snakeHeads[index].getSnakeDirection());
+        !isMoved && this.StopAutoMovemenvent();        
       }
-      await this.delay(1000);
       await this.updateGamestatus('Ready');
-      console.log('Ready');
       await this.snakePlayerService.PrintBoardOnConsole();
-      await this.delay(2000);
+      console.log('Ready');
+      await this.delay( gameInstance.getStepIntervalBySeconds() * 1000);
     }, gameInstance.getStepIntervalBySeconds() * 1000);
   }
 

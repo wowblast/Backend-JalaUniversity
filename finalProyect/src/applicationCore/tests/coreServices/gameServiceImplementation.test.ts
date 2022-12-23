@@ -101,13 +101,13 @@ describe('Game Service Implementation', () => {
     expect(setTimeout).toHaveBeenCalledTimes(1);
   });
 
-  test('should end  game and delete game instance', async () => {
+  test('should end  game and update status game instance', async () => {
     const boardSize = 3;
     await gameServiceImplementation.CreateGame(boardSize, 5);
     await gameServiceImplementation.EndGame();
-    const results = await repository.find();
+    const gameInstance = await gameServiceImplementation.GetGameStatus();
+    expect(gameInstance.getStatus()).toBe('Ended');
 
-    expect(results.length).toBe(0);
   });
 
   test('should restart the game and create new board', async () => {
