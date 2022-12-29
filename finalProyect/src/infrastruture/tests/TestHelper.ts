@@ -20,12 +20,12 @@ export class TestHelper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private testdb!: any;
   async setupTestDB (): Promise<void> {
-    this.testdb = new Database(':memory:', { verbose: console.log });
 
     const dataSource = {
-      name: 'default',
-      type: 'better-sqlite3',
-      database: ':memory:',
+      type: 'mongodb',
+      host: 'localhost',
+      port: 27017,
+      database: 'testgame',
       entities: [BoardPosition, SnakePlayer, Game, SnakePlayerLeaderBoard],
       synchronize: true
     };
@@ -40,6 +40,5 @@ export class TestHelper {
 
   async teardownTestDB (): Promise<void> {
     await this.dbConnect.destroy();
-    this.testdb.close();
   }
 }

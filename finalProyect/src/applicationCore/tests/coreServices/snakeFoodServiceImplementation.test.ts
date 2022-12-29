@@ -1,4 +1,4 @@
-import BoardPosition from '../../../infrastruture/entities/gameBoardPosition';
+/*import BoardPosition from '../../../infrastruture/entities/gameBoardPosition';
 import { TestHelper } from '../testhelper';
 import BoardPositionServiceImplementation from '../../coreServices/boardPositionServiceImplementation';
 import BoardPositionRepositoryImplementation from '../../../infrastruture/repositories/boardPositionRepository';
@@ -20,10 +20,10 @@ let snakeFoodServiceImplementation: SnakeFoodServiceImplementation;
 
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB();
-  boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getRepository(BoardPosition));
-  gameRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(Game));
-  snakePlayerLeaderBoardRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(SnakePlayerLeaderBoard));
-  snakePlayerRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(SnakePlayer));
+  boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getMongoRepository(BoardPosition));
+  gameRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getMongoRepository(Game));
+  snakePlayerLeaderBoardRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getMongoRepository(SnakePlayerLeaderBoard));
+  snakePlayerRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getMongoRepository(SnakePlayer));
   boardPositionServiceImplementation = new BoardPositionServiceImplementation(boardPositionRepository);
   snakeFoodServiceImplementation = new SnakeFoodServiceImplementation(boardPositionServiceImplementation);
 });
@@ -32,8 +32,8 @@ afterEach(async () => {
   const entities = TestHelper.instance.getDatasource().entityMetadatas;
 
   for (const entity of entities) {
-    const repository = TestHelper.instance.getDatasource().getRepository(entity.name);
-    await repository.clear();
+    const repository = TestHelper.instance.getDatasource().getMongoRepository(entity.name);
+    await repository.delete({});
   }
 });
 
@@ -71,3 +71,4 @@ describe('snake Food Service Implementation', () => {
     expect(foodPosition.getBoardPositionType()).toBe('empty');
   });
 });
+*/

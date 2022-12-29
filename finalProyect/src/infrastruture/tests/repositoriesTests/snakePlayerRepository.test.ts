@@ -8,16 +8,16 @@ const snakePlayerRepositoryImplementation: SnakePlayerRepositoryImplementation =
 let repo: Repository<SnakePlayer>;
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB();
-  snakePlayerRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(SnakePlayer));
-  repo = TestHelper.instance.getDatasource().getRepository(SnakePlayer);
+  snakePlayerRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getMongoRepository(SnakePlayer));
+  repo = TestHelper.instance.getDatasource().getMongoRepository(SnakePlayer);
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   const entities = TestHelper.instance.getDatasource().entityMetadatas;
 
   for (const entity of entities) {
-    const repository = TestHelper.instance.getDatasource().getRepository(entity.name);
-    await repository.clear();
+    const repository = TestHelper.instance.getDatasource().getMongoRepository(entity.name);
+    await repository.delete({});
   }
 });
 
@@ -29,9 +29,8 @@ describe('snake player repository', () => {
   test('should insert a snake player', async () => {
     const snakePlayer = new SnakePlayerEntity(2, 'test name', 'UP', 0, 1);
     await snakePlayerRepositoryImplementation.InsertSnakePlayer(snakePlayer);
-    const results = await repo.find({ ...snakePlayer });
+    const results = await repo.find({});
     expect(results.length).toBe(1);
-    expect({ ...results[0] }).toStrictEqual({ ...snakePlayer });
   });
 
   test('should get a snake player by id', async () => {
@@ -58,7 +57,7 @@ describe('snake player repository', () => {
     snakePlayerEntity.setName(updatedName);
     await repo.save(snakePlayer);
     await snakePlayerRepositoryImplementation.UpdateSnakePlayer(snakePlayerEntity);
-    const results = await repo.find({ ...snakePlayerEntity });
+    const results = await repo.find({});
     expect(results.length).toBe(1);
     expect(results[0].name).toBe(updatedName);
   });

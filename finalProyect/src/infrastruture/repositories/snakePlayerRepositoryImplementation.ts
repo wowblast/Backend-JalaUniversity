@@ -4,16 +4,16 @@ import { AppDataSource } from '../data-source';
 import SnakePlayer from '../entities/snakePlayer';
 import SnakePlayerMapper from '../mappers/snakePlayerMapper';
 import { injectable } from 'inversify';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 @injectable()
 export default class SnakePlayerRepositoryImplementation implements SnakePlayerRepository {
-  private repository: Repository<SnakePlayer>;
+  private repository: MongoRepository<SnakePlayer>;
 
   constructor () {
-    this.repository = AppDataSource.getRepository(SnakePlayer);
+    this.repository = AppDataSource.getMongoRepository(SnakePlayer);
   }
 
-  setRepository (repository: Repository<SnakePlayer>): void {
+  setRepository (repository: MongoRepository<SnakePlayer>): void {
     this.repository = repository;
   }
 
@@ -24,7 +24,9 @@ export default class SnakePlayerRepositoryImplementation implements SnakePlayerR
 
   async UpdateSnakePlayer (snakePlayerEntity: SnakePlayerEntity): Promise<SnakePlayerEntity> {
     const snakePlayer: SnakePlayer = SnakePlayerMapper.castToDBEntity(snakePlayerEntity);
-    await this.repository.save(snakePlayer);
+    const currentSnakePlayer: SnakePlayer = await this.repository.findOneByOrFail({playerId: snakePlayer.playerId});
+    const updatePlayer = {...snakePlayer, _id: currentSnakePlayer._id};
+    await this.repository.save(updatePlayer);
     return snakePlayerEntity;
   }
 

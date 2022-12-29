@@ -1,6 +1,6 @@
 import SnakePlayerEntity from '../../applicationCore/entities/snakePlayerEntity';
 import SnakePlayerLeaderBoardEntity from '../../applicationCore/entities/snakePlayerLeaderboardEntity';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 import { SnakePlayerLeaderBoardRepository } from '../../applicationCore/coreIrepositories/snakePlayerLeaderBoardRepository';
 import { AppDataSource } from '../data-source';
 import SnakePlayerLeaderBoard from '../entities/snakePlayerLeaderBoard';
@@ -9,21 +9,23 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class SnakePlayerLeaderBoardRepositoryImplementation implements SnakePlayerLeaderBoardRepository {
-  private repository: Repository<SnakePlayerLeaderBoard>;
+  private repository: MongoRepository<SnakePlayerLeaderBoard>;
 
   constructor () {
-    this.repository = AppDataSource.getRepository(SnakePlayerLeaderBoard);
+    this.repository = AppDataSource.getMongoRepository(SnakePlayerLeaderBoard);
   }
 
-  setRepository (repository: Repository<SnakePlayerLeaderBoard>): void {
+  setRepository (repository: MongoRepository<SnakePlayerLeaderBoard>): void {
     this.repository = repository;
   }
 
   async InsertSnakePlayerOnLeaderBoard (snakePlayer: SnakePlayerEntity): Promise<void> {
+    const lastScore = await this.repository.find({});
     const snakePlayerLeaderBoard: SnakePlayerLeaderBoard = new SnakePlayerLeaderBoard();
     snakePlayerLeaderBoard.name = snakePlayer.getName();
     snakePlayerLeaderBoard.playerId = snakePlayer.getPLayerId();
     snakePlayerLeaderBoard.score = snakePlayer.getScore();
+    snakePlayerLeaderBoard.id = 1 + lastScore.length;
     await this.repository.save(snakePlayerLeaderBoard);
   }
 

@@ -4,16 +4,16 @@ import GameEntity from '../../applicationCore/entities/gameEntity';
 import Game from '../entities/game';
 import GameMapper from '../mappers/gameMapper';
 import { injectable } from 'inversify';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 @injectable()
 export default class GameRepositoryImplementation implements GameRepository {
-  private repository: Repository<Game>;
+  private repository: MongoRepository<Game>;
 
   constructor () {
-    this.repository = AppDataSource.getRepository(Game);
+    this.repository = AppDataSource.getMongoRepository(Game);
   }
 
-  setRepository (repository: Repository<Game>): void {
+  setRepository (repository: MongoRepository<Game>): void {
     this.repository = repository;
   }
 
@@ -24,7 +24,9 @@ export default class GameRepositoryImplementation implements GameRepository {
 
   async UpdateGameInstance (gameEntity: GameEntity): Promise<GameEntity> {
     const gameInstance: Game = GameMapper.castToDBEntity(gameEntity);
-    await this.repository.save(gameInstance);
+    const currentInstance: Game = await this.repository.findOneByOrFail({id: gameInstance.id});
+    const updateGame = {...gameInstance, _id: currentInstance._id};
+    await this.repository.save(updateGame);
     return gameEntity;
   }
 

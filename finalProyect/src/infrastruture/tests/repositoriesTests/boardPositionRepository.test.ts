@@ -6,15 +6,15 @@ import BoardPositionRepositoryImplementation from '../../repositories/boardPosit
 const boardPositionRepository: BoardPositionRepositoryImplementation = new BoardPositionRepositoryImplementation();
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB();
-  boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getRepository(BoardPosition));
+  boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getMongoRepository(BoardPosition));
 });
 
-afterEach(async () => {
+beforeEach (async () => {
   const entities = TestHelper.instance.getDatasource().entityMetadatas;
 
   for (const entity of entities) {
-    const repository = TestHelper.instance.getDatasource().getRepository(entity.name);
-    await repository.clear();
+    const repository = TestHelper.instance.getDatasource().getMongoRepository(entity.name);
+    await repository.delete({});
   }
 });
 

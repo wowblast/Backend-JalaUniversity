@@ -8,16 +8,16 @@ const gameRepositoryImplementation: GameRepositoryImplementation = new GameRepos
 let repository: Repository<Game>;
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB();
-  gameRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(Game));
-  repository = TestHelper.instance.getDatasource().getRepository(Game);
+  gameRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getMongoRepository(Game));
+  repository = TestHelper.instance.getDatasource().getMongoRepository(Game);
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   const entities = TestHelper.instance.getDatasource().entityMetadatas;
 
   for (const entity of entities) {
-    const repository = TestHelper.instance.getDatasource().getRepository(entity.name);
-    await repository.clear();
+    const repository = TestHelper.instance.getDatasource().getMongoRepository(entity.name);
+    await repository.delete({});
   }
 });
 
@@ -29,7 +29,7 @@ describe('game repository', () => {
   test('should insert a new game', async () => {
     const gameInstance = new GameEntity(1, 'Ready', 5, 3);
     await gameRepositoryImplementation.InsertGameInstance(gameInstance);
-    const results = await repository.find({ ...gameInstance });
+    const results = await repository.findBy({ id: gameInstance.getId() });
     expect(results.length).toBe(1);
   });
 
@@ -50,13 +50,12 @@ describe('game repository', () => {
     gameInstance.boardSize = 5;
     gameInstance.id = 1;
     gameInstance.status = 'Ready';
-    gameInstance.stepIntervalBySeconds = 1;
-    const gameInstanceEntity = new GameEntity(1, 'Ready', 5, 3);
-    gameInstanceEntity.setStatus('Ended');
+    gameInstance.stepIntervalBySeconds = 3;
+    const gameInstanceEntity = new GameEntity(1, 'Ended', 5, 3);
     await repository.save(gameInstance);
     gameInstanceEntity.setStatus('Ended');
     await gameRepositoryImplementation.UpdateGameInstance(gameInstanceEntity);
-    const results = await repository.find();
+    const results = await repository.find({});
     expect(results.length).toBe(1);
     expect(results[0].status).toBe(gameInstanceEntity.getStatus());
   });
@@ -69,7 +68,7 @@ describe('game repository', () => {
     gameInstance.stepIntervalBySeconds = 1;
     await repository.save(gameInstance);
     await gameRepositoryImplementation.DeleteGameInstance(gameInstance.id);
-    const results = await repository.find();
+    const results = await repository.find({});
     expect(results.length).toBe(0);
   });
 });

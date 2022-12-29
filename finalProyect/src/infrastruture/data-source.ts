@@ -5,11 +5,14 @@ import Game from './entities/game';
 import SnakePlayerLeaderBoard from './entities/snakePlayerLeaderBoard';
 
 export const AppDataSource = new DataSource({
-  type: 'sqlite',
-  database: 'database.sqllite',
+  type: 'mongodb',
+  host: 'localhost',
+  port: 27017,
+  database: 'test',
   synchronize: true,
   logging: false,
   entities: [BoardPosition, SnakePlayer, Game, SnakePlayerLeaderBoard],
   migrations: [],
   subscribers: []
 });
+

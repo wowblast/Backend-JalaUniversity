@@ -11,8 +11,8 @@ let boardPositionServiceImplementation: BoardPositionServiceImplementation;
 let repository: Repository<BoardPosition>;
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB();
-  repository = TestHelper.instance.getDatasource().getRepository(BoardPosition);
-  boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getRepository(BoardPosition));
+  repository = TestHelper.instance.getDatasource().getMongoRepository(BoardPosition);
+  boardPositionRepository.setRepo(TestHelper.instance.getDatasource().getMongoRepository(BoardPosition));
   boardPositionServiceImplementation = new BoardPositionServiceImplementation(boardPositionRepository);
 });
 
@@ -20,8 +20,8 @@ afterEach(async () => {
   const entities = TestHelper.instance.getDatasource().entityMetadatas;
 
   for (const entity of entities) {
-    const repository = TestHelper.instance.getDatasource().getRepository(entity.name);
-    await repository.clear();
+    const repository = TestHelper.instance.getDatasource().getMongoRepository(entity.name);
+    await repository.delete({});
   }
 });
 
@@ -115,7 +115,8 @@ describe('board Position Service Implementation', () => {
 
   test('should get a point by x and y positions', async () => {
     await boardPositionServiceImplementation.CreateBoard(4);
-    await repository.save(boardPosition);
+    const entityHead: GameBoardPositionEntity = new GameBoardPositionEntity(1,1,1,'head',0,0,'UP');
+    await boardPositionRepository.UpdatePointOnBoard(entityHead);
 
     const results: GameBoardPositionEntity = await boardPositionServiceImplementation.GetBoardPositionByPosition(0, 0);
 

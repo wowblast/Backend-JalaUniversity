@@ -6,12 +6,13 @@ import { AppDataSource } from '../data-source';
 import BoardPosition from '../entities/gameBoardPosition';
 import GameBoardPositionMapper from '../mappers/gameBoardPositionMapper';
 import { BoardPositionType, BoardPositionTypesList } from '../../applicationCore/types.ts/types';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
+import GameBoardPosition from '../entities/gameBoardPosition';
 @injectable()
 export default class BoardPositionRepositoryImplementation implements BoardPositionRepository {
-  private repository: Repository<BoardPosition>;
+  private repository: MongoRepository<BoardPosition>;
   constructor () {
-    this.repository = AppDataSource.getRepository(BoardPosition);
+    this.repository = AppDataSource.getMongoRepository(BoardPosition);
   }
 
   setRepo (repository): void {
@@ -21,16 +22,19 @@ export default class BoardPositionRepositoryImplementation implements BoardPosit
   async CreateBoard (size: number): Promise<GameBoardPositionEntity[]> {
     await this.ClearBoard();
 
-    const boardPosition = new BoardPosition();
-    boardPosition.playerId = DefaultPlayerIDonBoard;
-    boardPosition.positionType = BoardPositionTypesList.Empty;
+    let index = 1;
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
+        const boardPosition = new BoardPosition();
+        boardPosition.id = index;
+      boardPosition.playerId = DefaultPlayerIDonBoard;
+    boardPosition.positionType = BoardPositionTypesList.Empty;
         boardPosition.xPosition = x;
         boardPosition.yPosition = y;
         boardPosition.snakeBodyIndentifier = DefaultSnakeBodyIdentifier;
         boardPosition.snakeDirection = DefaultNextPointBoardDirection;
         await this.repository.save(boardPosition);
+        index++;
       }
     }
     return await this.GetAllPositions();
@@ -52,7 +56,7 @@ export default class BoardPositionRepositoryImplementation implements BoardPosit
   }
 
   async ClearBoard (): Promise<void> {
-    await this.repository.clear();
+    await this.repository.delete({});
   }
 
   async InsertPointOnBoard (gameBoardPositionEntity: GameBoardPositionEntity): Promise<void> {
@@ -71,7 +75,9 @@ export default class BoardPositionRepositoryImplementation implements BoardPosit
 
   async UpdatePointOnBoard (gameBoardPositionEntity: GameBoardPositionEntity): Promise<GameBoardPositionEntity> {
     const boardPosition: BoardPosition = GameBoardPositionMapper.castToDBEntity(gameBoardPositionEntity);
-    await this.repository.save(boardPosition);
+    const position: GameBoardPosition = await this.repository.findOneByOrFail({id: boardPosition.id});
+    const updatePoint = {...boardPosition, _id: position._id};
+    await this.repository.save(updatePoint);
     return gameBoardPositionEntity;
   }
 

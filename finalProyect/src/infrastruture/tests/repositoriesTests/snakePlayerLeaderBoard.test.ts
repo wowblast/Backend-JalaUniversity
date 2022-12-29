@@ -9,16 +9,16 @@ const snakePlayerLeaderBoardRepositoryImplementation: SnakePlayerLeaderBoardRepo
 let repository: Repository<SnakePlayerLeaderBoard>;
 beforeAll(async () => {
   await TestHelper.instance.setupTestDB();
-  snakePlayerLeaderBoardRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getRepository(SnakePlayerLeaderBoard));
-  repository = TestHelper.instance.getDatasource().getRepository(SnakePlayerLeaderBoard);
+  snakePlayerLeaderBoardRepositoryImplementation.setRepository(TestHelper.instance.getDatasource().getMongoRepository(SnakePlayerLeaderBoard));
+  repository = TestHelper.instance.getDatasource().getMongoRepository(SnakePlayerLeaderBoard);
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   const entities = TestHelper.instance.getDatasource().entityMetadatas;
 
   for (const entity of entities) {
-    const repository = TestHelper.instance.getDatasource().getRepository(entity.name);
-    await repository.clear();
+    const repository = TestHelper.instance.getDatasource().getMongoRepository(entity.name);
+    await repository.delete({});
   }
 });
 
@@ -30,7 +30,7 @@ describe('snake Player LeaderBoard Repository', () => {
   test('should insert a snake player on leaderBoard', async () => {
     const snakePlayer = new SnakePlayerEntity(2, 'test name', 'UP', 15, 16);
     await snakePlayerLeaderBoardRepositoryImplementation.InsertSnakePlayerOnLeaderBoard(snakePlayer);
-    const results = await repository.find({ ...snakePlayer });
+    const results = await repository.find({});
     expect(results.length).toBe(1);
   });
 
@@ -43,17 +43,18 @@ describe('snake Player LeaderBoard Repository', () => {
     snakePlayerBestScore.score = 15;
     await repository.save(snakePlayerBestScore);
     await snakePlayerLeaderBoardRepositoryImplementation.RemoveSnakePlayerFromLeaderBoard(snakePlayerBestScoreDomainEntity);
-    const results = await repository.find();
+    const results = await repository.find({});
     expect(results.length).toBe(0);
   });
 
   test('should get snake players from leaderBoard', async () => {
-    const snakePlayerBestScore = new SnakePlayerLeaderBoard();
+    let snakePlayerBestScore = new SnakePlayerLeaderBoard();
     snakePlayerBestScore.id = 1;
     snakePlayerBestScore.name = 'best 1';
     snakePlayerBestScore.playerId = 1;
     snakePlayerBestScore.score = 15;
     await repository.save(snakePlayerBestScore);
+    snakePlayerBestScore = new SnakePlayerLeaderBoard();
     snakePlayerBestScore.id = 2;
     snakePlayerBestScore.name = 'best 2';
     snakePlayerBestScore.playerId = 2;
@@ -61,7 +62,7 @@ describe('snake Player LeaderBoard Repository', () => {
     await repository.save(snakePlayerBestScore);
 
     await snakePlayerLeaderBoardRepositoryImplementation.GetSnakePlayerLeaderBoard();
-    const results = await repository.find();
+    const results = await repository.find({});
     expect(results.length).toBe(2);
   });
 });
