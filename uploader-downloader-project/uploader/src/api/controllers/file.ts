@@ -1,16 +1,38 @@
 
-import { uploadFileMiddleware} from '../filesUploadsManagement/upload'
-import { RabbitMqController } from '../rabbitmq/rabbitMQcontroller'
-export const uploadFile = async (req, res): Promise<void> => {
-  console.log("uoload")
-  try {
-    console.log("file", req.file)
-    await uploadFileMiddleware(req, res);
-    //await RabbitMqController.getInstance().sendMessage('hola 1')
-    //await RabbitMqController.getInstance().sendMessage('hola 2')
 
-    //RabbitMqController.getInstance().receiveMessages()
+import { FileService } from '../services/coreServices/fileService';
+export const uploadFile = async (req, res): Promise<void> => {
+  try {
+    if(req.file) {
+      const fileService = new FileService()
+      await fileService.uploadFile(req.file.originalname )
+    }
     res.json({uploadFile: 'pending', status: 'ok'});
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+
+export const getFile = async (req, res): Promise<void> => {
+  console.log("getting file")
+  try {
+    const fileService = new FileService()
+    const fileFound = await fileService.getFile(req.body.filename);
+    res.json({getfile: 'pending', file: fileFound});    
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+
+export const deleteFile = async (req, res): Promise<void> => {
+  console.log("deleting file")
+  try {
+
+    //const uploader = new UploaderGridFs()
+    //await uploader.deleteFile(req.body.filename)
+    res.json({getfile: 'pending', status: 'ok'});
+
+    
   } catch (err) {
     res.status(500).send(err);
   }

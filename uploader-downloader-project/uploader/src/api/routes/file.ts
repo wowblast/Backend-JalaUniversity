@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { uploadFile } from '../controllers/file';
+import { uploadFile, getFile, deleteFile } from '../controllers/file';
+import { uploadFileToMongo } from '../Infrastructure/mongodb/gridFsManager';
 const routes = Router();
 
-routes.get('/file', uploadFile);
-routes.post('/file', uploadFile);
-routes.put('/file', uploadFile);
-routes.delete('/file', uploadFile);
+routes.get('/file', getFile);
+routes.post('/file',uploadFileToMongo.single('file'), uploadFile);
+routes.delete('/file', deleteFile);
 
 //routes.post('/file', createBoard);
 //routes.delete('/file', clearBoard);

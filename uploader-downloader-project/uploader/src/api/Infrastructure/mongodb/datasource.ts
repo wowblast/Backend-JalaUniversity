@@ -1,5 +1,7 @@
 import { DataSource } from "typeorm"
 import { AccountEntity } from "./entities/accountEntity";
+import { FileChunk } from "./entities/fileChunk";
+import { FileData } from "./entities/fileData";
 
 export const AppDataSource = new DataSource({
     type: 'mongodb',
@@ -8,7 +10,7 @@ export const AppDataSource = new DataSource({
     database: 'uploader',
     synchronize: true,
     logging: false,
-    entities: [AccountEntity],
+    entities: [AccountEntity, FileData, FileChunk],
     migrations: [],
     subscribers: []
   });

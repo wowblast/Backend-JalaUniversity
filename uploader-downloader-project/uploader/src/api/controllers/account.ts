@@ -52,6 +52,8 @@ export const createAccount = async (req, res): Promise<void> => {
     try {
       const accountService = new AccountService()
       const account =  await accountService.GetAccount(req.body.email)
+      
+      console.log("ready")
 
       res.json({getAccount:'ok', account});
     } catch (err) {

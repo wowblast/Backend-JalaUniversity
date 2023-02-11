@@ -1,4 +1,4 @@
-import { accountRepositoryImplementation } from '../../mongodb/accountRepositoryImplementation';
+import { accountRepositoryImplementation } from '../../Infrastructure/mongodb/accountRepositoryImplementation';
 import { Account } from '../entities/account';
 export class AccountService {
 
