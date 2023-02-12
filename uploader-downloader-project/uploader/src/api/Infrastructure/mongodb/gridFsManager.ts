@@ -4,8 +4,8 @@ import { MongoRepository } from "typeorm";
 import { AppDataSource } from "./datasource";
 import { FileData } from "./entities/fileData";
 import { FileChunk } from "./entities/fileChunk";
-import { MongoClient, GridFSBucket } from "mongodb";
-import { createWriteStream } from "fs";
+import { MongoClient, GridFSBucket, ObjectId } from "mongodb";
+import fs from "fs";
 import { File } from "../../services/entities/file";
 import { FileMapper } from '../mappers/fileMapper';
 
@@ -29,7 +29,7 @@ export class GridFsManager {
   }
 
   async initializeMongoDB() {
-    this.mongouri = "mongodb://127.0.0.1:27017";
+    this.mongouri = "mongodb://localhost:27017";
     const client = new MongoClient(this.mongouri);
     client.connect(err => {
       console.log("MongoDB connected");
@@ -52,10 +52,38 @@ export class GridFsManager {
       files_id: fileFound._id,
     });
     console.log("chunks", chunks.length);
-    /*this.bucket.openDownloadStreamByName('myFile').
-    pipe(createWriteStream('../files'));*/
+
+    //console.log("buket", this.bucket)
+    //const cursor = this.bucket.find({_id:fileFound._id}).toArray();
+    this.downloadFile(fileFound._id, fileFound.filename)
+
+    //const a =   this.bucket.openDownloadStream(new ObjectId(fileFound._id))
+    //fs.write
     await AppDataSource.destroy();
+    //console.log("cursor", a)
     return FileMapper.toDomainEntity(fileFound);
+  }
+
+  async downloadFile(id: string, name:string) {
+    console.log("whatsapp.png")
+    //()=>fs.createWriteStream('./src/api/Infrastructure/mongodb/outtest/'+ name)
+    let test  
+    this.bucket.openDownloadStream(new ObjectId(id))
+        .pipe(fs.createWriteStream('./src/api/Infrastructure/mongodb/outtest/'+ name)).
+        on('error', function(error) {
+          console.log("error",error)
+        }).
+        on('finish', function() {
+          console.log('done!');
+          fs.unlinkSync('./src/api/Infrastructure/mongodb/outtest/'+ name);
+
+        });
+    
+  }
+
+  getData(streamdata: WritableStream) {
+    console.log("strea,",streamdata)
+
   }
 
   getFiles() {}
