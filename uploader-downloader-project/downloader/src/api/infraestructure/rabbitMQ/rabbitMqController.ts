@@ -82,6 +82,9 @@ export class RabbitMqController {
             case 'create':
                 await this.createGoogleDrive(message.file as GoogleDriveFile)
                 break;
+            case 'delete':
+                await this.deleteGoogleDriveFile(message.file as GoogleDriveFile)
+                break;
         
             default:
                 break;
@@ -94,6 +97,12 @@ export class RabbitMqController {
       }
       this.isMessagesManagerReady = true;
     }
+  }
+  
+  async deleteGoogleDriveFile(file: GoogleDriveFile) {
+    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation = new GoogleDriveRepositoryImplementation();
+    await googleDriveRepositoryImplementation.deleteFile(file.fileName);
+
   }
 
   async createGoogleDrive(file: GoogleDriveFile) {
