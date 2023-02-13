@@ -5,9 +5,10 @@ import { AccountRepositoryImplementation } from "../mongodb/accountRepositoryImp
 import { FileData } from "../mongodb/entities/fileData";
 import fs from "fs";
 import { GoogleDriveFileRepositoryImplementation } from "../mongodb/googleDriveFileRepositoryImplementation";
-import { GoogleDriveFile } from '../../services/entities/googleDriveFile';
+import { GoogleDriveFile } from "../../services/entities/googleDriveFile";
 import { GridFsManager } from "../mongodb/gridFsManager";
 import { statusTypes } from "../../types/statusTypes";
+import { RabbitMqController } from "../rabbitmq/rabbitMQcontroller";
 export class GoogleDriveManager {
   private static _instance: GoogleDriveManager = new GoogleDriveManager();
   private accountRepository: AccountRepositoryImplementation;
@@ -102,6 +103,7 @@ export class GoogleDriveManager {
     googleDriveFile.fileName = fileData.filename;
     googleDriveFile.fileId = id;
     await this.saveGoogleDriveFileOnDataBase(googleDriveFile);
+    await this.sendFilesToDownloader(googleDriveFile);
   }
 
   async saveGoogleDriveFileOnDataBase(googleDriveFile: GoogleDriveFile) {
@@ -110,12 +112,27 @@ export class GoogleDriveManager {
     await googleDriveFileRepositoryImplementation.insertFile(googleDriveFile);
   }
 
-  async deleteGoogleDriveFilesOnAllAccounts(googleDriveFiles: GoogleDriveFile[]) {
-    const accountManager = new AccountRepositoryImplementation()
+  async sendFilesToDownloader(googleDriveFile: GoogleDriveFile) {
+    const message = {
+      method: "create",
+      file: googleDriveFile,
+    };
+    await RabbitMqController.getInstance().sendMessage(JSON.stringify(message));
+  }
+
+  async deleteGoogleDriveFilesOnAllAccounts(
+    googleDriveFiles: GoogleDriveFile[]
+  ) {
+    const accountManager = new AccountRepositoryImplementation();
 
     for (let index = 0; index < googleDriveFiles.length; index++) {
-      const account = await accountManager.getAccount(googleDriveFiles[index].email)
-      await this.deleteFileOnGoogleDrive(account, googleDriveFiles[index].fileId);
+      const account = await accountManager.getAccount(
+        googleDriveFiles[index].email
+      );
+      await this.deleteFileOnGoogleDrive(
+        account,
+        googleDriveFiles[index].fileId
+      );
       console.log("delete done on " + this.accounts[index].email);
     }
   }

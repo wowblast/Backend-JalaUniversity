@@ -1,4 +1,4 @@
-import { AccountRepositoryImplementation } from '../../postresql/accountRepositoryImplementation';
+import { AccountRepositoryImplementation } from '../../infraestructure/postresql/accountRepositoryImplementation';
 import { Account } from '../entities/account';
 export class AccountService {
 

@@ -1,5 +1,4 @@
 import { GridFsManager } from "../../Infrastructure/mongodb/gridFsManager";
-import { RabbitMqController } from "../../Infrastructure/rabbitmq/rabbitMQcontroller";
 import { statusTypes } from "../../types/statusTypes";
 import { File } from "../entities/file";
 import { GoogleDriveFileRepositoryImplementation } from '../../Infrastructure/mongodb/googleDriveFileRepositoryImplementation';
@@ -29,11 +28,6 @@ export class FileService {
     const files = await googleDriveFileRepositoryImplementation.getFile(filename)
     const fileFound = await gridFsManager.getFile(filename);
     return [fileFound, files]
-  }
-
-  async sendMessage() {
-    await RabbitMqController.getInstance().sendMessage("hola 1");
-    await RabbitMqController.getInstance().sendMessage("hola 2");
   }
 
   async uploadLocalFileToDrive(filename: string): Promise<File> {

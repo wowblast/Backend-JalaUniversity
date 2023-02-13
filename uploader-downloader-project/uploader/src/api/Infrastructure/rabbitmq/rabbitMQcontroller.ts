@@ -59,9 +59,9 @@ export class RabbitMqController {
     public async  sendMessage(message:string) {
         console.log("mesage sent: ", message)
 
-        this.channel.sendToQueue(this.uploadChannel, Buffer.from(message))
-        this.channel.sendToQueue(this.downloadChannel, Buffer.from("hola download"))
-        this.channel.sendToQueue(this.statisticsChannel, Buffer.from("hola statiscits"))
+        //this.channel.sendToQueue(this.uploadChannel, Buffer.from(message))
+        this.channel.sendToQueue(this.downloadChannel, Buffer.from(message))
+        //this.channel.sendToQueue(this.statisticsChannel, Buffer.from("hola statiscits"))
 
 
     }

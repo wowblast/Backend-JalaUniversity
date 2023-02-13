@@ -1,5 +1,5 @@
 import app from './Api/';
-import { RabbitMqController } from './api/rabbitMQ/rabbitMQcontroller';
+import { RabbitMqController } from './api/infraestructure/rabbitMQ/rabbitMQcontroller';
 const port = '3002';
 RabbitMqController.getInstance().initializateRabbitMQ()
 

@@ -1,5 +1,6 @@
 import { ErrorHandler } from '../errorHandling/errorHandler';
 export = (req, res, next) => {
+    console.log("file middeware", req.file)
   if(req.file) {
     next();
   } else {

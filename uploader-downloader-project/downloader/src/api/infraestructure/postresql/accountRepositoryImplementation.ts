@@ -1,8 +1,8 @@
-import { AccountRepository } from "../services/interfaces/Account";
+import { AccountRepository } from "../../services/interfaces/Account";
 import { Repository } from "typeorm"
 import { AppDataSource } from "./datasource";
 import { AccountEntity } from "./entities/accountEntity";
-import { Account } from '../services/entities/account';
+import { Account } from '../../services/entities/account';
 import "reflect-metadata"; 
 
 export class AccountRepositoryImplementation implements AccountRepository {

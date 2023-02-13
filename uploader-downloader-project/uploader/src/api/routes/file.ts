@@ -7,7 +7,7 @@ import verifyFileStatus from '../middlewares/verifyFileStatus';
 const routes = Router();
 
 routes.get('/file',verifyFilenameData, getFile);
-routes.post('/file',verifyFileStatus , uploadFileToMongo.single('file'), uploadFile);
+routes.post('/file', uploadFileToMongo.single('file'), uploadFile);
 routes.delete('/file', verifyFilenameData, deleteFile);
 routes.use(ErrorHandlerMiddleware)
 

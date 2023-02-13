@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm"
 import { AccountEntity } from "./entities/accountEntity";
+import { GoogleDriveFileEntity } from "./entities/googleDriveFileEntity";
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
@@ -10,7 +11,7 @@ export const AppDataSource = new DataSource({
     password: 'Welcome4$',
     synchronize: true,
     logging: false,
-    entities: [AccountEntity],
+    entities: [AccountEntity, GoogleDriveFileEntity],
     migrations: [],
     subscribers: []
   });

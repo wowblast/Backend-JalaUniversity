@@ -3,7 +3,7 @@ export = (req, res, next) => {
   if(haveCorrectData(req.body.email)) {
     next();
   } else {
-    const errorHandler = new ErrorHandler(new Error("BAD REQUEST"));
+    const errorHandler = new ErrorHandler(new Error("BAD REQUEST NO EMAIL"));
     const errorMessage = errorHandler.createErrorResponse()  ;
     res.status(errorMessage.statusCode).json(errorMessage);
   }

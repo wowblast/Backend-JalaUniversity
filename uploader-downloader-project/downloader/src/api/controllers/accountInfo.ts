@@ -1,5 +1,5 @@
 import { AccountService } from '../services/coreServices/accountService';
-import { AccountEntity } from '../postresql/entities/accountEntity';
+import { AccountEntity } from '../infraestructure/postresql/entities/accountEntity';
 
 
 export const createAccount = async (req, res): Promise<void> => {

@@ -13,6 +13,8 @@ export const uploadFile = async (req, res, next): Promise<void> => {
         fileStatus: 'Pending'
       });
 
+    } else {
+      throw new Error("NO FILE")
     }
   } catch (err) {
     next(err);
