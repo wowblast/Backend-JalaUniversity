@@ -6,15 +6,17 @@ import { FileData } from "./entities/fileData";
 import { FileChunk } from "./entities/fileChunk";
 import { MongoClient, GridFSBucket, ObjectId } from "mongodb";
 import fs from "fs";
-import { File } from '../../services/entities/file';
-import { FileMapper } from '../mappers/fileMapper';
-import { GoogleDriveManager } from '../googledrive/googledriveManager';
+import { File } from "../../services/entities/file";
+import { FileMapper } from "../mappers/fileMapper";
+import { GoogleDriveManager } from "../googledrive/googledriveManager";
+import { statusTypes } from "../../types/statusTypes";
 
 export class GridFsManager {
   private bucket: GridFSBucket;
   private gfs;
   private mongouri;
   private static _instance: GridFsManager = new GridFsManager();
+  private client;
 
   private repository: MongoRepository<FileData>;
   private chunksRepository: MongoRepository<FileChunk>;
@@ -31,66 +33,79 @@ export class GridFsManager {
 
   async initializeMongoDB() {
     this.mongouri = "mongodb://localhost:27017";
-    const client = new MongoClient(this.mongouri);
-    client.connect(err => {
-      console.log("MongoDB connected");
-      const mongodb = client.db("uploader");
-    this.bucket = new GridFSBucket(mongodb, { bucketName: 'uploads' });
-  
-  });    
     this.repository = AppDataSource.getMongoRepository(FileData);
     this.chunksRepository = AppDataSource.getMongoRepository(FileChunk);
+
+  }
+
+  async initMongoDBconnection() {
+    this.client = new MongoClient(this.mongouri);
+    await new Promise((resolve, reject) => {
+      this.client.connect((err) => {
+        console.log("MongoDB connected");
+        const mongodb = this.client.db("uploader");
+        this.bucket = new GridFSBucket(mongodb, { bucketName: "uploads" });
+        resolve(1);
+      });
+    });
+  }
+
+  async closeMongoDBconnection() {
+    await new Promise((resolve, reject) => {
+      this.client.close((err) => {
+        console.log("MongoDB closed");       
+        resolve(1);
+      });
+    });
   }
 
   async getFile(filename: string): Promise<File> {
     await AppDataSource.initialize();
-    const fileFound: FileData = await this.repository.findOneByOrFail({
+    const fileFound: FileData = await this.repository.findOneBy({
       filename,
     });
-
-    const chunks: FileChunk[] = await this.chunksRepository.findBy({
-      files_id: fileFound._id,
-    });
-
-    //console.log("buket", this.bucket)
-    //const cursor = this.bucket.find({_id:fileFound._id}).toArray();
-    //this.downloadFile(fileFound)
-
-    //const a =   this.bucket.openDownloadStream(new ObjectId(fileFound._id))
-    //fs.write
     await AppDataSource.destroy();
-    //console.log("cursor", a)
-    return FileMapper.toDomainEntity(fileFound);
+    return fileFound ? FileMapper.toDomainEntity(fileFound) : null;
   }
 
-  async downloadFile(filename: string) {
+  async uploadFileFromGridFsToDrive(filename: string) {
     await AppDataSource.initialize();
     const fileFound: FileData = await this.repository.findOneByOrFail({
       filename,
     });
     await AppDataSource.destroy();
-    this.bucket.openDownloadStream(new ObjectId(fileFound._id))
-        .pipe(fs.createWriteStream('./src/api/Infrastructure/mongodb/outtest/'+ fileFound.filename)).
-        on('error', function(error) {
-          console.log("error",error)
-        }).
-        on('finish', async function() {
-          console.log('done!');
-          await GoogleDriveManager.getInstance().uploadFileToGoogleDrive(fileFound)
-          console.log("done file to all accounts")
+    await this.initMongoDBconnection()
+    //const innerThis = this
+    await new Promise((resolve, reject) => {
+      this.bucket
+        .openDownloadStream(new ObjectId(fileFound._id))
+        .pipe(
+          fs.createWriteStream(
+            "./src/api/Infrastructure/mongodb/outtest/" + fileFound.filename
+          )
+        )
+        .on("error", function (error) {
+          console.log("error", error);
+          reject(error);
+        })
+        .on("finish", async function () {
+          resolve(1);
         });
-    
+    });
+    await this.closeMongoDBconnection()
+    await GoogleDriveManager.getInstance().uploadFileToGoogleDrive(
+      fileFound
+    );
+
   }
 
   getData(streamdata: WritableStream) {
-    console.log("strea,",streamdata)
-
+    console.log("strea,", streamdata);
   }
 
   getFiles() {}
 
-  async deleteFile(filename: string) {   
-
+  async deleteFile(filename: string) {
     await AppDataSource.initialize();
     const fielFounded: FileData = await this.repository.findOneByOrFail({
       filename,
@@ -106,15 +121,11 @@ export class GridFsManager {
 
   async updateFileStatus(filename: string, status: string) {
     await AppDataSource.initialize();
-
     const file: FileData = await this.repository.findOneByOrFail({
       filename,
     });
-
-    console.log("updating status");
     file.status = status;
     await this.repository.save(file);
-
     await AppDataSource.destroy();
   }
 

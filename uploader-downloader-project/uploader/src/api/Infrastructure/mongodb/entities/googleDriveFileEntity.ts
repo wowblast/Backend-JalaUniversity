@@ -16,4 +16,7 @@ export class GoogleDriveFileEntity {
 
     @Column()
     fileName: string
+
+    @Column()
+    fileId: string
 }

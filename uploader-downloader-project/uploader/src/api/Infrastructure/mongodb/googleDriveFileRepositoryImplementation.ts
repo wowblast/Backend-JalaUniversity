@@ -24,9 +24,9 @@ export class GoogleDriveFileRepositoryImplementation implements GoogleDriveFileR
     }
     async getFile(fileName: string): Promise<GoogleDriveFile[]> {
         await AppDataSource.initialize();
-        const files: GoogleDriveFileEntity[]= await this.repository.findBy({fileName})        
+        const files: GoogleDriveFileEntity[]= await this.repository.findBy({fileName})   
         await AppDataSource.destroy();
-        return files.map(file => GoogleDriveFileMapper.toDomainEntity(file));
+        return files.length !== 0? files.map(file => GoogleDriveFileMapper.toDomainEntity(file)): [];
     }
     async updateFile(fileName: string, newfIleName: string): Promise<void> {
         await AppDataSource.initialize();

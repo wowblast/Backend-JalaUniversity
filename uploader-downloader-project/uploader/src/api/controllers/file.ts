@@ -5,9 +5,12 @@ export const uploadFile = async (req, res): Promise<void> => {
   try {
     if(req.file) {
       const fileService = new FileService()
-      await fileService.uploadFile(req.file.originalname )
+      await fileService.uploadFile(req.file.originalname)
+     // const [fileFound, googleDriveFiles] = await fileService.getFile(req.body.filename);
+      //res.json({file: fileFound, googleDriveFiles: googleDriveFiles});
+      res.json({getfile: 'pending', status: 'ok'});
+
     }
-    res.json({uploadFile: 'pending', status: 'ok'});
   } catch (err) {
     res.status(500).send(err);
   }

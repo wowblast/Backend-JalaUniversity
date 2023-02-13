@@ -12,6 +12,8 @@ export class GoogleDriveFileMapper {
     googleDriveFile.email = googleDriveFileEntity.email;
     googleDriveFile.fileName = googleDriveFileEntity.fileName;
     googleDriveFile.webViewLink = googleDriveFileEntity.webViewLink;
+    googleDriveFile.fileId = googleDriveFileEntity.fileId;
+
     return googleDriveFile;
   }
 
@@ -25,6 +27,8 @@ export class GoogleDriveFileMapper {
     googleDriveFileEntity.email = googleDriveFile.email;
     googleDriveFileEntity.fileName = googleDriveFile.fileName;
     googleDriveFileEntity.webViewLink = googleDriveFile.webViewLink;
+    googleDriveFileEntity.fileId = googleDriveFile.fileId;
+
     return googleDriveFileEntity;
   }
 }

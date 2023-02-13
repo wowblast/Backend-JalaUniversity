@@ -5,6 +5,7 @@ import { FileData } from "./entities/fileData";
 import { GoogleDriveFileEntity } from "./entities/googleDriveFileEntity";
 
 export const AppDataSource = new DataSource({
+    useUnifiedTopology: true,
     type: 'mongodb',
     host: 'localhost',
     port: 27017,
