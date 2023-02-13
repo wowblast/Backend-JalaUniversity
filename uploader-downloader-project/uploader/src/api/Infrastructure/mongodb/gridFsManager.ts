@@ -70,7 +70,7 @@ export class GridFsManager {
 
   async uploadFileFromGridFsToDrive(filename: string) {
     await AppDataSource.initialize();
-    const fileFound: FileData = await this.repository.findOneByOrFail({
+    const fileFound: FileData = await this.repository.findOneBy({
       filename,
     });
     await AppDataSource.destroy();
@@ -107,11 +107,11 @@ export class GridFsManager {
 
   async deleteFile(filename: string) {
     await AppDataSource.initialize();
-    const fielFounded: FileData = await this.repository.findOneByOrFail({
+    const fielFounded: FileData = await this.repository.findOneBy({
       filename,
     });
     await this.chunksRepository.deleteMany({
-      files_id: fielFounded._id,
+      files_id: fielFounded?._id || '',
     });
     console.log("delted file", fielFounded);
     await this.repository.deleteOne(fielFounded);
@@ -121,7 +121,7 @@ export class GridFsManager {
 
   async updateFileStatus(filename: string, status: string) {
     await AppDataSource.initialize();
-    const file: FileData = await this.repository.findOneByOrFail({
+    const file: FileData = await this.repository.findOneBy({
       filename,
     });
     file.status = status;

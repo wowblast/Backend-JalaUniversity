@@ -21,7 +21,7 @@ export class AccountRepositoryImplementation implements AccountRepository {
   }
   async deleteAccount(email: string): Promise<void> {
     await AppDataSource.initialize();
-    const deletedGame: AccountEntity = await this.repository.findOneByOrFail({
+    const deletedGame: AccountEntity = await this.repository.findOneBy({
       email,
     });
     await this.repository.delete(deletedGame);
@@ -29,7 +29,7 @@ export class AccountRepositoryImplementation implements AccountRepository {
   }
   async getAccount(email: string): Promise<Account> {
     await AppDataSource.initialize();
-    const accountFound: AccountEntity = await this.repository.findOneByOrFail({
+    const accountFound: AccountEntity = await this.repository.findOneBy({
       email,
     });
     await AppDataSource.destroy();
@@ -45,7 +45,7 @@ export class AccountRepositoryImplementation implements AccountRepository {
   }
   async updateAccount(account: Account): Promise<void> {
     await AppDataSource.initialize();
-    const accountDB = await this.repository.findOneByOrFail({
+    const accountDB = await this.repository.findOneBy({
       email: account.email,
     });
     accountDB.clientId = account.clientId;

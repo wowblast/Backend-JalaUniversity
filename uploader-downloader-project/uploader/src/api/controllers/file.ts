@@ -1,44 +1,51 @@
 
 
+import { HttpStatusCode } from '../errorHandling/errorHandler';
 import { FileService } from '../services/coreServices/fileService';
-export const uploadFile = async (req, res): Promise<void> => {
+export const uploadFile = async (req, res, next): Promise<void> => {
   try {
     if(req.file) {
-      const fileService = new FileService()
-      await fileService.uploadFile(req.file.originalname)
-     // const [fileFound, googleDriveFiles] = await fileService.getFile(req.body.filename);
-      //res.json({file: fileFound, googleDriveFiles: googleDriveFiles});
-      res.json({getfile: 'pending', status: 'ok'});
+      const fileService = new FileService();
+      await fileService.uploadFile(req.file.originalname);
+      res.status(HttpStatusCode.CREATED).json({
+        statusCode: HttpStatusCode.CREATED,
+        message: 'File Uploaded',
+        fileStatus: 'Pending'
+      });
 
     }
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const getFile = async (req, res): Promise<void> => {
+export const getFile = async (req, res, next): Promise<void> => {
   console.log("getting file")
   try {
     const fileService = new FileService()
     const [fileFound, googleDriveFiles] = await fileService.getFile(req.body.filename);
-    res.json({file: fileFound, googleDriveFiles: googleDriveFiles});    
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: 'File Found',
+      file: fileFound,
+      googleDriveFiles: googleDriveFiles
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const deleteFile = async (req, res): Promise<void> => {
+export const deleteFile = async (req, res, next): Promise<void> => {
   console.log("deleting file")
   try {
     const fileService = new FileService()
     await fileService.deleteFile(req.body.filename);
-    //const uploader = new UploaderGridFs()
-    //await uploader.deleteFile(req.body.filename)
-    res.json({getfile: 'pending', status: 'ok'});
-
-    
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: 'File Deleted'
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 

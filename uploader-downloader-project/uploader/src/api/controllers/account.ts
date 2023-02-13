@@ -1,7 +1,8 @@
 import { AccountService } from "../services/coreServices/accountService";
 import { Account } from "../services/entities/account";
+import { HttpStatusCode } from '../errorHandling/errorHandler';
 
-export const createAccount = async (req, res): Promise<void> => {
+export const createAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
     console.log(req.body);
@@ -12,23 +13,29 @@ export const createAccount = async (req, res): Promise<void> => {
     newAccount.redirectUri = req.body.redirectUri;
     newAccount.refrestToken = req.body.refrestToken;
     await accountService.InsertAccount(newAccount);
-    res.json({ createAccount: "ok" });
+    res.status(HttpStatusCode.CREATED).json({
+      statusCode: HttpStatusCode.CREATED,
+      message: 'Account Created'
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const removeAccount = async (req, res): Promise<void> => {
+export const removeAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
     await accountService.DeleteAccount(req.body.email);
-    res.json({ removeAccount: "ok" });
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: 'Account Deleted'
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const updateAccount = async (req, res): Promise<void> => {
+export const updateAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
     console.log(req.body);
@@ -39,30 +46,40 @@ export const updateAccount = async (req, res): Promise<void> => {
     newAccount.redirectUri = req.body.redirectUri;
     newAccount.refrestToken = req.body.refrestToken;
     await accountService.UpdateAccount(newAccount);
-    res.json({ updateAccount: "ok" });
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: 'Account Updated'
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const getAccount = async (req, res): Promise<void> => {
-  console.log("get account")
+export const getAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();    
     const account = await accountService.GetAccount(req.params.email);
-    res.json({ getAccount: "ok", account });
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: 'Account Found',
+      account
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const getAllAccounts = async (req, res): Promise<void> => {
+export const getAllAccounts = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();    
     const accounts = await accountService.GetAllAccounts();
-    res.json({ getAccount: "ok", accounts: accounts });
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: 'Account Found',
+      accounts: accounts
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
