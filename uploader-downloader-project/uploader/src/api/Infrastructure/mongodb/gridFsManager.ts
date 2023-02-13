@@ -6,8 +6,9 @@ import { FileData } from "./entities/fileData";
 import { FileChunk } from "./entities/fileChunk";
 import { MongoClient, GridFSBucket, ObjectId } from "mongodb";
 import fs from "fs";
-import { File } from "../../services/entities/file";
+import { File } from '../../services/entities/file';
 import { FileMapper } from '../mappers/fileMapper';
+import { GoogleDriveManager } from '../googledrive/googledriveManager';
 
 export class GridFsManager {
   private bucket: GridFSBucket;
@@ -47,15 +48,13 @@ export class GridFsManager {
       filename,
     });
 
-    console.log(fileFound);
     const chunks: FileChunk[] = await this.chunksRepository.findBy({
       files_id: fileFound._id,
     });
-    console.log("chunks", chunks.length);
 
     //console.log("buket", this.bucket)
     //const cursor = this.bucket.find({_id:fileFound._id}).toArray();
-    this.downloadFile(fileFound._id, fileFound.filename)
+    //this.downloadFile(fileFound)
 
     //const a =   this.bucket.openDownloadStream(new ObjectId(fileFound._id))
     //fs.write
@@ -64,19 +63,21 @@ export class GridFsManager {
     return FileMapper.toDomainEntity(fileFound);
   }
 
-  async downloadFile(id: string, name:string) {
-    console.log("whatsapp.png")
-    //()=>fs.createWriteStream('./src/api/Infrastructure/mongodb/outtest/'+ name)
-    let test  
-    this.bucket.openDownloadStream(new ObjectId(id))
-        .pipe(fs.createWriteStream('./src/api/Infrastructure/mongodb/outtest/'+ name)).
+  async downloadFile(filename: string) {
+    await AppDataSource.initialize();
+    const fileFound: FileData = await this.repository.findOneByOrFail({
+      filename,
+    });
+    await AppDataSource.destroy();
+    this.bucket.openDownloadStream(new ObjectId(fileFound._id))
+        .pipe(fs.createWriteStream('./src/api/Infrastructure/mongodb/outtest/'+ fileFound.filename)).
         on('error', function(error) {
           console.log("error",error)
         }).
-        on('finish', function() {
+        on('finish', async function() {
           console.log('done!');
-          fs.unlinkSync('./src/api/Infrastructure/mongodb/outtest/'+ name);
-
+          await GoogleDriveManager.getInstance().uploadFileToGoogleDrive(fileFound)
+          console.log("done file to all accounts")
         });
     
   }

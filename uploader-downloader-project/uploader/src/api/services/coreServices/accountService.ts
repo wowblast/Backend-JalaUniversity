@@ -1,34 +1,30 @@
-import { accountRepositoryImplementation } from '../../Infrastructure/mongodb/accountRepositoryImplementation';
+import { AccountRepositoryImplementation } from '../../Infrastructure/mongodb/accountRepositoryImplementation';
 import { Account } from '../entities/account';
 export class AccountService {
 
-    private accountRepository: accountRepositoryImplementation
+    private accountRepository: AccountRepositoryImplementation
 
     constructor() {
-        this.accountRepository = new accountRepositoryImplementation()
+        this.accountRepository = new AccountRepositoryImplementation()
     }
 
     async InsertAccount(newAccount: Account) {
-        const account = new Account()
-        account.apiKey = "apikey"
-        account.email = "emain"
-        account.googleApiKey = "google"
-        account.name = "email 1"
-        await this.accountRepository.InsertAccount(newAccount)
-
+        await this.accountRepository.insertAccount(newAccount);
     }
 
     async DeleteAccount(email: string) {
-        
-        await this.accountRepository.DeleteAccount(email)
-
+        await this.accountRepository.deleteAccount(email);
     }
 
-    async GetAccount(email: string) {
-        return await this.accountRepository.GetAccount(email)
+    async GetAccount(email: string):Promise<Account> {
+        return await this.accountRepository.getAccount(email)
+    }
+
+    async GetAllAccounts(): Promise<Account[]> {
+        return await this.accountRepository.getAllAccounts()
     }
 
     async UpdateAccount(account: Account) {
-        await this.accountRepository.UpdateAccount(account)
+        await this.accountRepository.updateAccount(account)
     }
 }

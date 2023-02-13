@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { createAccount, getAccount, removeAccount, updateAccount } from '../controllers/account';
+import { createAccount, getAccount, removeAccount, updateAccount, getAllAccounts } from '../controllers/account';
 const routes = Router();
 
-routes.get('/', getAccount);
+routes.get('/:email', getAccount);
+routes.get('/', getAllAccounts);
 routes.post('/', createAccount);
 routes.put('/', updateAccount);
 routes.delete('/', removeAccount);

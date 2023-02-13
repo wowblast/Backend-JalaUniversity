@@ -1,9 +1,9 @@
-import { ObjectID } from "typeorm"
 
-export class Account {
-    _id: string
-    name: string
-    email: string
-    googleApiKey: string
-    apiKey: string
+export class Account {  
+    _id: string;
+    email: string;
+    clientId: string;
+    clientSecret: string;
+    redirectUri: string;
+    refrestToken: string;
 }

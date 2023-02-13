@@ -1,7 +1,7 @@
 import { Entity, ObjectIdColumn, Column } from "typeorm"
 
 @Entity()
-export class AccountEntity {
+export class GoogleDriveFileEntity {
     @ObjectIdColumn()
     _id: string
 
@@ -9,14 +9,11 @@ export class AccountEntity {
     email: string
 
     @Column()
-    clientId: string
+    webViewLink: string
 
     @Column()
-    clientSecret: string
+    directDownloadLink: string   
 
     @Column()
-    redirectUri: string
-
-    @Column()
-    refrestToken: string
+    fileName: string
 }

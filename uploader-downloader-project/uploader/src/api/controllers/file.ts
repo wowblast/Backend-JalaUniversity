@@ -17,8 +17,8 @@ export const getFile = async (req, res): Promise<void> => {
   console.log("getting file")
   try {
     const fileService = new FileService()
-    const fileFound = await fileService.getFile(req.body.filename);
-    res.json({getfile: 'pending', file: fileFound});    
+    const [fileFound, googleDriveFiles] = await fileService.getFile(req.body.filename);
+    res.json({file: fileFound, googleDriveFiles: googleDriveFiles});    
   } catch (err) {
     res.status(500).send(err);
   }
@@ -27,7 +27,8 @@ export const getFile = async (req, res): Promise<void> => {
 export const deleteFile = async (req, res): Promise<void> => {
   console.log("deleting file")
   try {
-
+    const fileService = new FileService()
+    await fileService.deleteFile(req.body.filename);
     //const uploader = new UploaderGridFs()
     //await uploader.deleteFile(req.body.filename)
     res.json({getfile: 'pending', status: 'ok'});
