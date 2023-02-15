@@ -6,14 +6,8 @@ export class AccountEntity {
     id: number
 
     @Column()
-    name: string
-
-    @Column()
     email: string
 
     @Column()
-    files: string
-
-    @Column()
-    status: string
+    downloadedData: number
 }

@@ -13,6 +13,7 @@ export class GoogleDriveFileMapper {
     googleDriveFile.fileName = googleDriveFileEntity.fileName;
     googleDriveFile.webViewLink = googleDriveFileEntity.webViewLink;
     googleDriveFile.fileId = googleDriveFileEntity.fileId;
+    googleDriveFile.fileSize = googleDriveFileEntity.fileSize;
 
     return googleDriveFile;
   }
@@ -28,6 +29,7 @@ export class GoogleDriveFileMapper {
     googleDriveFileEntity.fileName = googleDriveFile.fileName;
     googleDriveFileEntity.webViewLink = googleDriveFile.webViewLink;
     googleDriveFileEntity.fileId = googleDriveFile.fileId;
+    googleDriveFileEntity.fileSize = googleDriveFile.fileSize;
 
     return googleDriveFileEntity;
   }

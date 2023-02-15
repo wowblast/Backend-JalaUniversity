@@ -5,5 +5,7 @@ export class GoogleDriveFile {
     webViewLink: string
     directDownloadLink: string   
     fileName: string
-    fileId: string
+    fileId: string    
+    fileSize: number
+
 }

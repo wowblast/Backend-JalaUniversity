@@ -5,4 +5,5 @@ export class GoogleDriveFile {
     directDownloadLink: string
     fileName: string
     fileId: string
+    fileSize: number
 }

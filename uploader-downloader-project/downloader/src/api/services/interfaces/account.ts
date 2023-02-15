@@ -1,7 +1,7 @@
 import { Account } from '../entities/account';
 export interface AccountRepository {
-    InsertAccount(account: Account): Promise<void>;
-    DeleteAccount(email: string): Promise<void>;
-    GetAccount(email: string): Promise<Account>;
-    UpdateAccount(account: Account): Promise<void>;
+    insertAccount(account: Account): Promise<void>;
+    deleteAccount(email: string): Promise<void>;
+    getAccount(email: string): Promise<Account>;
+    updateAccount(account: Account): Promise<void>;
 }

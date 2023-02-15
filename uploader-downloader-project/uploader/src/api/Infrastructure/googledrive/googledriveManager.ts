@@ -102,6 +102,7 @@ export class GoogleDriveManager {
     googleDriveFile.email = email;
     googleDriveFile.fileName = fileData.filename;
     googleDriveFile.fileId = id;
+    googleDriveFile.fileSize = parseInt(fileData.length)
     await this.saveGoogleDriveFileOnDataBase(googleDriveFile);
     await this.sendFilesToDownloader(googleDriveFile);
   }

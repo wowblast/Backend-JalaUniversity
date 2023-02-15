@@ -1,6 +1,8 @@
 import client, { Channel, Connection, ConsumeMessage } from "amqplib";
 import { GoogleDriveFile } from '../../services/entities/googleDriveFile';
 import { GoogleDriveRepositoryImplementation } from '../postresql/googleDriveFileRepositoryImplementation';
+import { AccountService } from '../../services/coreServices/accountService';
+import { Account } from '../../services/entities/account';
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -81,11 +83,11 @@ export class RabbitMqController {
         switch (message.method) {
             case 'create':
                 await this.createGoogleDrive(message.file as GoogleDriveFile)
+                await this.createAccount(message.file.email)
                 break;
             case 'delete':
                 await this.deleteGoogleDriveFile(message.file as GoogleDriveFile)
-                break;
-        
+                break;        
             default:
                 break;
         }
@@ -108,6 +110,14 @@ export class RabbitMqController {
   async createGoogleDrive(file: GoogleDriveFile) {
     const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation = new GoogleDriveRepositoryImplementation();
     await googleDriveRepositoryImplementation.insertFile(file);
+  }
+
+  async createAccount(email: string) {
+    const accountService  = new AccountService()
+    const newAccount = new Account()
+    newAccount.email = email;
+    newAccount.downloadedData = 0;
+    await accountService.insertAccountIfNewAccount(newAccount)
   }
 
   public static getInstance(): RabbitMqController {

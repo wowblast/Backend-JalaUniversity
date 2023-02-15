@@ -8,22 +8,25 @@ export class AccountService {
         this.accountRepository = new AccountRepositoryImplementation()
     }
 
-    async InsertAccount(newAccount: Account) {
-        await this.accountRepository.InsertAccount(newAccount)
-
+    async insertAccountIfNewAccount(newAccount: Account) {
+        const accountFound = await this.accountRepository.getAccount(newAccount.email)
+        if(!accountFound)
+          await this.accountRepository.insertAccount(newAccount)
     }
 
-    async DeleteAccount(email: string) {
-        
-        await this.accountRepository.DeleteAccount(email)
-
+    async deleteAccount(email: string) {
+        await this.accountRepository.deleteAccount(email)
     }
 
-    async GetAccount(email: string) {
-        return await this.accountRepository.GetAccount(email)
+    async getAccount(email: string) {
+        return await this.accountRepository.getAccount(email)
     }
 
-    async UpdateAccount(account: Account) {
-        await this.accountRepository.UpdateAccount(account)
+    async updateAccount(account: Account) {
+        await this.accountRepository.updateAccount(account)
+    }
+
+    async getAllAccounts() {
+        return await this.accountRepository.getAccounts();
     }
 }

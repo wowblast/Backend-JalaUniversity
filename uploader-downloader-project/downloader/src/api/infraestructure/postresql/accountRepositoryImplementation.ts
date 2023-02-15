@@ -4,6 +4,7 @@ import { AppDataSource } from "./datasource";
 import { AccountEntity } from "./entities/accountEntity";
 import { Account } from '../../services/entities/account';
 import "reflect-metadata"; 
+import { AccountMapper } from "../mappers/account";
 
 export class AccountRepositoryImplementation implements AccountRepository {
 
@@ -12,51 +13,42 @@ export class AccountRepositoryImplementation implements AccountRepository {
     constructor () {
         this.repository = AppDataSource.getRepository(AccountEntity);
       }
-    async InsertAccount(account: Account): Promise<void> {
-        await AppDataSource.initialize()
-        const accountDB = new AccountEntity()
-
-        accountDB.name = account.name;
-        accountDB.files = account.status;
-        accountDB.status = account.status;
-        accountDB.email = account.email;
-        console.log(accountDB, "before")
-        await this.repository.save(accountDB)  //this.repository.save(accountDB);
-        console.log("Post has been saved: ", accountDB);
-
-        await AppDataSource.destroy()
+    async insertAccount(account: Account): Promise<void> {
+        const accountDB = AccountMapper.toMongoEntity(account)       
+        await this.repository.save(accountDB)
     }
-    async DeleteAccount(email: string): Promise<void> {
-        await AppDataSource.initialize()
+    async deleteAccount(email: string): Promise<void> {
 
         const deletedGame: AccountEntity = await this.repository.findOneByOrFail({
             email
           });
           await this.repository.delete(deletedGame);
-          await AppDataSource.destroy()
-
     }
-    async GetAccount(email: string): Promise<Account> {
-        await AppDataSource.initialize()
-
-        const accountFound: AccountEntity = await this.repository.findOneByOrFail({
+    async getAccount(email: string): Promise<Account> {
+        const accountFound: AccountEntity = await this.repository.findOneBy({
             email
           });
-          await AppDataSource.destroy()
           return accountFound
     }
-    async UpdateAccount(account: Account): Promise<void> {
-        await AppDataSource.initialize()
+
+    async getLeastUsedAccount() {
+      const accounts = await this.repository.find({})
+      const lestUsedAccount = accounts.sort((a, b) => a.downloadedData < b.downloadedData ? -1 : a.downloadedData > b.downloadedData ? 1 : 0)
+      console.log("lest ",lestUsedAccount)
+      return AccountMapper.toDomainEntity(lestUsedAccount[0]);
+    }
+    async updateAccount(account: Account): Promise<void> {
         const accountDB = await this.repository.findOneByOrFail({
             email: account.email
           });
-        accountDB.name = account.name;
-        accountDB.files = account.status;
-        accountDB.status = account.status;
-        await AppDataSource.mongoManager.save(accountDB);
-        console.log("Post has been updated: ", accountDB);
+        accountDB.id = account.id;
+        accountDB.downloadedData = account.downloadedData;
+        await this.repository.save(accountDB);
+    }
 
-        await AppDataSource.destroy()
+    async getAccounts() {
+      const accounts = await this.repository.find()
+      return accounts.map(account => AccountMapper.toDomainEntity(account))
     }
 
 }
