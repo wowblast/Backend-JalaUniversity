@@ -1,11 +1,15 @@
 import { AccountReportService } from '../services/coreServices/accountReportService';
 import { AccountReport } from '../services/entities/accountReport';
+import { AccountService } from '../services/coreServices/accountService';
 export const getAccountReport = async (req, res): Promise<void> => {
     try {
       const accountReportService = new AccountReportService()
-      const reportsFounded = await accountReportService.getAccountReports(req.body.email)
+      const accountService = new AccountService()
 
-      res.json({status:'200', email: req.body.email, reports:reportsFounded});
+      const reportsFounded = await accountReportService.getAccountReports(req.body.email)
+      const accountInfo = await accountService.getAccount(req.body.email)
+
+      res.json({status:'200', email: req.body.email , totalDownloaded: accountInfo.downloadedData, reports:reportsFounded});
     } catch (err) {
       res.status(500).send(err);
     }
