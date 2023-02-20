@@ -1,17 +1,17 @@
 import { AccountRepository } from "../../services/interfaces/Account";
 import { Repository } from "typeorm"
-import { AppDataSource } from "./datasource";
+import { SingletonAppDataSource } from "./datasource";
 import { AccountEntity } from "./entities/accountEntity";
 import { Account } from '../../services/entities/account';
 import "reflect-metadata"; 
-import { AccountMapper } from "../mappers/account";
+import { AccountMapper } from "../mappers/accountMapper";
 
 export class AccountRepositoryImplementation implements AccountRepository {
 
     private repository: Repository<AccountEntity>;
 
     constructor () {
-        this.repository = AppDataSource.getRepository(AccountEntity);
+        this.repository = SingletonAppDataSource.getInstance().getAppDataSource().getRepository(AccountEntity);
       }
     async insertAccount(account: Account): Promise<void> {
         const accountDB = AccountMapper.toMongoEntity(account)       

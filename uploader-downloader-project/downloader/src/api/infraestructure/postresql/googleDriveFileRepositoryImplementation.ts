@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { Repository } from "typeorm";
 import { GoogleDriveFile } from "../../services/entities/googleDriveFile";
 import { GoogleDriveRepository } from "../../services/interfaces/googleDriveFileRepository";
-import { AppDataSource } from "./datasource";
+import { SingletonAppDataSource } from "./datasource";
 import { GoogleDriveFileEntity } from "./entities/googleDriveFileEntity";
 import { GoogleDriveFileMapper } from "../mappers/googleDriveFileMapper";
 import { MongoQueryRunner } from "typeorm/driver/mongodb/MongoQueryRunner";
@@ -12,7 +12,7 @@ export class GoogleDriveRepositoryImplementation
   private repository: Repository<GoogleDriveFileEntity>;
 
   constructor() {
-    this.repository = AppDataSource.getRepository(GoogleDriveFileEntity);
+    this.repository = SingletonAppDataSource.getInstance().getAppDataSource().getRepository(GoogleDriveFileEntity);
   }
   async insertFile(googleDriveFile: GoogleDriveFile): Promise<void> {
     const googleDriveFileEntity =
@@ -25,21 +25,23 @@ export class GoogleDriveRepositoryImplementation
   async getFile(fileName: string): Promise<GoogleDriveFile[]> {
     const googleDriveFileEntities: GoogleDriveFileEntity[] =
       await this.repository.findBy({ fileName });
-    return googleDriveFileEntities.map((file) =>
+    return googleDriveFileEntities ? googleDriveFileEntities.map((file) =>
       GoogleDriveFileMapper.toDomainEntity(file)
-    );
+    ): [];
   }
   async updateFile(fileName: string, newFileName: string): Promise<void> {
     await this.repository.update({ fileName }, { fileName: newFileName });
   }
 
   async getFiles() {
+    console.log("is init ", SingletonAppDataSource.getInstance().getAppDataSource().isInitialized)
+
     return await this.repository.find()
   }
 
   async getFileByEmailAndFileName(email: string, fileName: string) {
     const googleDriveFile: GoogleDriveFileEntity =
       await this.repository.findOneBy({ fileName, email });
-    return GoogleDriveFileMapper.toDomainEntity(googleDriveFile)
+    return googleDriveFile? GoogleDriveFileMapper.toDomainEntity(googleDriveFile): null
   }
 }
