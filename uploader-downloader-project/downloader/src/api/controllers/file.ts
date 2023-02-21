@@ -11,6 +11,7 @@ export const downloadFile = async (req, res): Promise<void> => {
       const files = await googleDriveFileService.getFileByFileName(
         req.body.fileName
       );
+      InfluxDbController.getInstance().initInfluxDB()
       await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.downloadFile);
       res.json({ fileLinks: files || null, status: "200" });
     } else {

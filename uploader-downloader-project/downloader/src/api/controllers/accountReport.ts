@@ -11,6 +11,7 @@ export const getAccountReport = async (req, res): Promise<void> => {
       const reportsFounded = await accountReportService.getAccountReports(req.body.email)
       const accountInfo = await accountService.getAccount(req.body.email)
       if(accountInfo) {
+        InfluxDbController.getInstance().initInfluxDB()
         await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.getAccountReport);
 
         res.json({status:'200', email: req.body.email , totalDownloaded: accountInfo.downloadedData, reports:reportsFounded});
@@ -35,6 +36,7 @@ export const createAccountReport = async (req, res): Promise<void> => {
     accountReport.downloadedAmountInBytes = req.body.downloadedAmountInBytes;
     accountReport.downloadedFilesAmount = req.body.downloadedFilesAmount;
     await accountReportService.createNewReport(accountReport)
+    InfluxDbController.getInstance().initInfluxDB()
     await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountReport);
     res.json({status:'200', message: "reportCreated"});
   } catch (err) {

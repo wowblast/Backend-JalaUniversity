@@ -11,7 +11,9 @@ export const getFileReports = async (req, res): Promise<void> => {
       req.body.fileName
     );
     const fileData = await fileDataService.getFileData(req.body.fileName);
+    console.log("filedata", fileData)
     if(fileData) {
+      InfluxDbController.getInstance().initInfluxDB()
       await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.getFileReport);
       res.json({
         status: "200",
@@ -37,6 +39,7 @@ export const createFiletReport = async (req, res): Promise<void> => {
     fileReport.downloadedAmountInBytes = req.body.downloadedAmountInBytes;
     fileReport.downloadedFilesAmount = req.body.downloadedFilesAmount;
     await fileReportService.createNewReport(fileReport);
+    InfluxDbController.getInstance().initInfluxDB()
     await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountReport);
     res.json({ status: "200", message: "reportCreated" });
   } catch (err) {

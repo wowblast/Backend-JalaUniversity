@@ -52,7 +52,6 @@ export class RabbitMqController {
       await this.createChannel(this.downloadChannel);
       await this.createChannel(this.statisticsChannel);
       await this.startToReceiveMessages();
-      InfluxDbController.getInstance().initInfluxDB()
       console.log("init");
     }
   }
@@ -86,6 +85,7 @@ export class RabbitMqController {
   public async manageMessages() {
     //const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     if (this.isMessagesManagerReady) {
+      InfluxDbController.getInstance().initInfluxDB()
       this.isMessagesManagerReady = false;
       while (true) {
         //await sleep(5000);
