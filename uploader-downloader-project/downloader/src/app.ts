@@ -1,13 +1,15 @@
 import "reflect-metadata";
 
-import app from './Api/';
-import { SingletonAppDataSource } from './api/infraestructure/postresql/datasource';
-import { RabbitMqController } from './api/infraestructure/rabbitMQ/rabbitMQcontroller';
-const port = '3002';
-SingletonAppDataSource.getInstance().intiazilateAppDataSource()
+import app from "./Api/";
+import { SingletonAppDataSource } from "./api/infraestructure/postresql/datasource";
+import { RabbitMqController } from "./api/infraestructure/rabbitMQ/rabbitMQcontroller";
+const port = "3002";
 
-RabbitMqController.getInstance().initializateRabbitMQ()
+app.listen(port, async () => {
+  await SingletonAppDataSource.getInstance().intiazilateAppDataSource();
 
-app.listen(port, () => {
-    console.log(`Downloader service is running on port ${port}.`);
-  });
+  await RabbitMqController.getInstance().initializateRabbitMQ();
+
+
+  console.log(`Downloader service is running on port ${port}.`);
+});

@@ -25,7 +25,6 @@ export class HttpController {
     this.httpConfig.url = config.downloaderUrl + config.accountReportUri;
     this.httpConfig.data = data;
     const response = await axios(this.httpConfig);
-    console.log(response);
   }
 
   async sendPostToFileReport(fileReport: FileReport) {
@@ -40,6 +39,5 @@ export class HttpController {
     this.httpConfig.data = data;
 
     const response = await axios(this.httpConfig);
-    console.log(response);
   }
 }

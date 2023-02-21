@@ -1,16 +1,28 @@
 import { FileReportService } from "../services/coreServices/fileReportService";
 import { FileReport } from "../services/entities/fileReport";
+import { FileDataService } from '../services/coreServices/fileDataService';
+import { InfluxDbController } from "../influxDBController/influxDBcontroller";
+import { config } from "../../../config";
 export const getFileReports = async (req, res): Promise<void> => {
   try {
     const fileReport = new FileReportService();
+    const fileDataService = new FileDataService();
     const reportsFounded = await fileReport.getFileReportByFileName(
       req.body.fileName
     );
-    res.json({
-      status: "200",
-      fileName: req.body.fileName,
-      report: reportsFounded,
-    });
+    const fileData = await fileDataService.getFileData(req.body.fileName);
+    if(fileData) {
+      await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.getFileReport);
+      res.json({
+        status: "200",
+        fileName: fileData.fileName,
+        totalDownloaded:  fileData.downloadedData,
+        report: reportsFounded,
+      });
+
+    } else {
+      res.json({status:'202', message: 'file not found'});
+    }
   } catch (err) {
     res.status(500).send(err);
   }
@@ -25,7 +37,7 @@ export const createFiletReport = async (req, res): Promise<void> => {
     fileReport.downloadedAmountInBytes = req.body.downloadedAmountInBytes;
     fileReport.downloadedFilesAmount = req.body.downloadedFilesAmount;
     await fileReportService.createNewReport(fileReport);
-
+    await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountReport);
     res.json({ status: "200", message: "reportCreated" });
   } catch (err) {
     res.status(500).send(err);

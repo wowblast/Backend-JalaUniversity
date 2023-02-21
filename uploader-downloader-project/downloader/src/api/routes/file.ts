@@ -4,7 +4,7 @@ const routes = Router();
 
 //routes.get('/file/:id', downloadFile);
 routes.get('/', listFiles);
-routes.get('/:fileName', downloadFile);
+routes.get('/download', downloadFile);
 
 
 //routes.post('/file', createBoard);

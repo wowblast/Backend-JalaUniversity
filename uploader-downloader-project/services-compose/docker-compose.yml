@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+      - DOCKER_INFLUXDB_INIT_MODE=setup 
+      - DOCKER_INFLUXDB_INIT_USERNAME=admininit 
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin12345 
+      - DOCKER_INFLUXDB_INIT_ORG=systemOrg 
+      - DOCKER_INFLUXDB_INIT_BUCKET=systemBucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=admininitadmin12345
+
+    ports:
+      - '8086:8086'    
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-server
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    links:
+      - influxdb
+    ports:
+      - '3000:3000'

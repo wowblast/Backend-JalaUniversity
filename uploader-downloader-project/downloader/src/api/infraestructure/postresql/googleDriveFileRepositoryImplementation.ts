@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Repository } from "typeorm";
 import { GoogleDriveFile } from "../../services/entities/googleDriveFile";
 import { GoogleDriveRepository } from "../../services/interfaces/googleDriveFileRepository";

@@ -5,6 +5,7 @@ import { FileReport } from "../services/entities/fileReport";
 import { MessageData } from "../services/interfaces/messageData";
 import { config } from '../../../config';
 import logger from 'jet-logger';
+import { InfluxDbController } from '../influxDBController/influxDBcontroller';
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -25,6 +26,7 @@ export class RabbitMqController {
   }
 
   public async initializateRabbitMQ() {
+
     if (!this.connection) {
       this.connection = await client.connect(
         config.rabbitMqUrl
@@ -33,15 +35,19 @@ export class RabbitMqController {
         (channel: Channel) =>
         async (msg: ConsumeMessage | null): Promise<void> => {
           if (msg) {
+            console.log("message ",msg.content.toString())
             this.messages.push(msg.content.toString());
             await this.manageMessages();
             channel.ack(msg);
           }
         };
-      logger.info("hllo")
+        InfluxDbController.getInstance().initInfluxDB()
+
       await this.initializateChannel();
       await this.createChannel(this.statisticsChannel);
       await this.startToReceiveMessages();
+      logger.info("init")
+
     }
   }
 
@@ -108,11 +114,13 @@ export class RabbitMqController {
   }
 
   async createAccountReport(accountReport: AccountReport) {
+    await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createReport)
     const httpController = new HttpController();
     await httpController.sendPostToAccountReport(accountReport);
   }
 
   async createFileReport(fileReport: FileReport) {
+    await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createReport)
     const httpController = new HttpController();
     await httpController.sendPostToFileReport(fileReport);
   }

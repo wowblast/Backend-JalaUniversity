@@ -1,14 +1,17 @@
+import { config } from "../../../config";
+import { InfluxDbController } from "../influxDBController/influxDBcontroller";
 import { GoogleDriveFileService } from "../services/coreServices/googleDriveFileService";
 
 export const downloadFile = async (req, res): Promise<void> => {
   try {
-    console.log("downlaod con ", req.params.fileName)
-    if (req.params.fileName) {
+    console.log("downlaod con ", req.body.fileName)
+    if (req.body.fileName) {
       const googleDriveFileService: GoogleDriveFileService =
         new GoogleDriveFileService();
       const files = await googleDriveFileService.getFileByFileName(
-        req.params.fileName
+        req.body.fileName
       );
+      await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.downloadFile);
       res.json({ fileLinks: files || null, status: "200" });
     } else {
       res.json({ fileLinks: ['null'], status: "500" });

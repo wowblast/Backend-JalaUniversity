@@ -3,7 +3,6 @@ import { Repository } from "typeorm"
 import { SingletonAppDataSource } from "./datasource";
 import { AccountEntity } from "./entities/accountEntity";
 import { Account } from '../../services/entities/account';
-import "reflect-metadata"; 
 import { AccountMapper } from "../mappers/accountMapper";
 
 export class AccountRepositoryImplementation implements AccountRepository {

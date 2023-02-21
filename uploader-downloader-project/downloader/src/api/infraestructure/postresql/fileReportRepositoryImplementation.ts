@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Repository } from "typeorm";
 import { FileReport } from "../../services/entities/fileReport";
 import { FileReportMapper } from "../mappers/fileReportMapper";
@@ -37,7 +36,7 @@ export class FileReportRepositoryImplementation implements FileReportRepository 
         if (!SingletonAppDataSource.getInstance().getAppDataSource().isInitialized ) {
             await SingletonAppDataSource.getInstance().intiazilateAppDataSource()
         }       
-        const fileReportsFounded = await this.repository.find();      
+        const fileReportsFounded = await this.repository.findBy({fileName});      
         return fileReportsFounded? fileReportsFounded.map(fileReport => FileReportMapper.toDomainEntity(fileReport)): [];
     }
 }

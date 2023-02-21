@@ -13,7 +13,15 @@ export const config = {
     location: process.env.LOCATION,
     influxDbId: process.env.INFLUXDB_ID,
     actionTypes: {
-        createReport: 'create report from statistics '
+        downloadFile: 'download file',
+        getFileReport: 'get file report',
+        getAccountReport: 'get account report',
+        createAccountInfo: 'create account info',
+        createFileData: 'creaate file',
+        deleteFile: 'delete file',
+        deleteAccount: 'delete account',
+        createFileReport: 'create file report',
+        createAccountReport: 'create account report'
+
     }
 }
-

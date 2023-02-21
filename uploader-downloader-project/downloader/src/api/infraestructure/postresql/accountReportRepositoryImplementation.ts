@@ -4,7 +4,6 @@ import { AccountReportRepository } from '../../services/interfaces/accountReport
 import { SingletonAppDataSource } from './datasource';
 import { AccountReportEntity } from './entities/accountReportEntity';
 import { AccountReportMapper } from '../mappers/accountReportMapper';
-import "reflect-metadata";
 
 export class AccountReportRepositoryImplementation implements AccountReportRepository {
     private repository: Repository<AccountReportEntity>;
@@ -25,11 +24,11 @@ export class AccountReportRepositoryImplementation implements AccountReportRepos
         }
         await this.repository.delete(id);
     }
-    async getAccountReportByDate(date: string): Promise<AccountReport> {
+    async getAccountReportByDateAndEmail(date: string, email: string): Promise<AccountReport> {
         if (!SingletonAppDataSource.getInstance().getAppDataSource().isInitialized ) {
             await SingletonAppDataSource.getInstance().intiazilateAppDataSource()
         }
-        const accountReportFound = await this.repository.findOneBy({dateReport:date})
+        const accountReportFound = await this.repository.findOneBy({dateReport:date, email})
         return accountReportFound ? AccountReportMapper.toDomainEntity(accountReportFound): null
     }
     async getAccountReportsByEmail(email: string): Promise<AccountReport[]> {

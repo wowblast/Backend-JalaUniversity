@@ -1,15 +1,21 @@
 import client, { Channel, Connection, ConsumeMessage } from "amqplib";
-import { GoogleDriveFile } from '../../services/entities/googleDriveFile';
-import { GoogleDriveRepositoryImplementation } from '../postresql/googleDriveFileRepositoryImplementation';
-import { AccountService } from '../../services/coreServices/accountService';
-import { Account } from '../../services/entities/account';
+import { GoogleDriveFile } from "../../services/entities/googleDriveFile";
+import { GoogleDriveRepositoryImplementation } from "../postresql/googleDriveFileRepositoryImplementation";
+import { AccountService } from "../../services/coreServices/accountService";
+import { Account } from "../../services/entities/account";
+import { FileDataService } from "../../services/coreServices/fileDataService";
+import { FileData } from "../../services/entities/fileData";
+import { MessageData } from "../../services/interfaces/messageData";
+import { InfluxDbController } from "../../influxDBController/influxDBcontroller";
+import { config } from '../../../../config';
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
 
   private connection: Connection;
-  private channel: Channel;
+  channel: Channel;
   private downloadChannel: string = "downloadChannel";
+  private statisticsChannel: string = "statisticsChannel";
 
   private consumer;
   private isMessagesManagerReady = true;
@@ -36,16 +42,18 @@ export class RabbitMqController {
         async (msg: ConsumeMessage | null): Promise<void> => {
           if (msg) {
             console.log("downloadchannel", msg.content.toString());
-            this.messages.push(msg.content.toString())
-            this.manageMessages()
+            this.messages.push(msg.content.toString());
+            this.manageMessages();
             channel.ack(msg);
           }
         };
-      console.log("init");
       this.isMessagesManagerReady = true;
       await this.initializateChannel();
       await this.createChannel(this.downloadChannel);
+      await this.createChannel(this.statisticsChannel);
       await this.startToReceiveMessages();
+      InfluxDbController.getInstance().initInfluxDB()
+      console.log("init");
     }
   }
 
@@ -58,9 +66,14 @@ export class RabbitMqController {
   }
 
   public async sendMessage(message: string) {
-    console.log("mesage sent: ", message);
+    console.log("sent message tpe ", typeof message, message);
 
-    this.channel.sendToQueue(this.downloadChannel, Buffer.from(message));
+
+    try {
+      this.channel.sendToQueue(this.statisticsChannel, Buffer.from(message));
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   public async startToReceiveMessages() {
@@ -78,18 +91,24 @@ export class RabbitMqController {
         //await sleep(5000);
         let currentMesages = this.messages;
         //console.log("done ", currentMesages[0]);
-        console.log("messages remainign", currentMesages)
-        const message = JSON.parse(currentMesages[0])
+        console.log("messages remainign", currentMesages);
+        const message: MessageData = JSON.parse(currentMesages[0]);
         switch (message.method) {
-            case 'create':
-                await this.createGoogleDrive(message.file as GoogleDriveFile)
-                await this.createAccount(message.file.email)
-                break;
-            case 'delete':
-                await this.deleteGoogleDriveFile(message.file as GoogleDriveFile)
-                break;        
-            default:
-                break;
+          case "create":
+            await this.createGoogleDrive(message.file as GoogleDriveFile);
+            await this.createAccount(message.file.email);
+            await this.createFileData(message.file.fileName);
+            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountInfo);
+            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createFileData);
+            break;
+          case "delete":
+            await this.deleteGoogleDriveFile(message.file as GoogleDriveFile);
+            await this.deleteFileData(message.file.fileName);
+            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.deleteAccount);
+            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.deleteFile);
+            break;
+          default:
+            break;
         }
         this.messages.shift();
         console.log(this.messages);
@@ -100,27 +119,44 @@ export class RabbitMqController {
       this.isMessagesManagerReady = true;
     }
   }
-  
-  async deleteGoogleDriveFile(file: GoogleDriveFile) {
-    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation = new GoogleDriveRepositoryImplementation();
-    await googleDriveRepositoryImplementation.deleteFile(file.fileName);
 
+  async deleteGoogleDriveFile(file: GoogleDriveFile) {
+    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation =
+      new GoogleDriveRepositoryImplementation();
+    await googleDriveRepositoryImplementation.deleteFile(file.fileName);
   }
 
+  async deleteFileData(fileName: string) {
+    const fileDataService = new FileDataService();
+    await fileDataService.deleteFileData(fileName);
+  }
   async createGoogleDrive(file: GoogleDriveFile) {
-    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation = new GoogleDriveRepositoryImplementation();
+    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation =
+      new GoogleDriveRepositoryImplementation();
     await googleDriveRepositoryImplementation.insertFile(file);
   }
 
   async createAccount(email: string) {
-    const accountService  = new AccountService()
-    const newAccount = new Account()
+    const accountService = new AccountService();
+    const newAccount = new Account();
     newAccount.email = email;
     newAccount.downloadedData = 0;
-    await accountService.insertAccountIfNewAccount(newAccount)
+    await accountService.insertAccountIfNewAccount(newAccount);
+  }
+
+  async createFileData(fileName: string) {
+    const fileDataService = new FileDataService();
+    const newFileData = new FileData();
+    newFileData.downloadedData = 0;
+    newFileData.fileName = fileName;
+    await fileDataService.insertFileIfNewFile(newFileData);
   }
 
   public static getInstance(): RabbitMqController {
     return RabbitMqController._instance;
   }
+
+  public getChnnael() {
+    console.log(this.channel);
+    console.log("conec", this.connection);  }
 }
