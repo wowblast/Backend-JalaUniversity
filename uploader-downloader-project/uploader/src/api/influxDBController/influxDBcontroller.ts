@@ -17,7 +17,6 @@ export class InfluxDbController {
   }
 
   public async saveActionStatus(actionValue: string) {
-    console.log(this.influxConnection);
     const newPoint: Point = new Point(config.influxDbId);
     newPoint.tag("actions", actionValue);
     newPoint.intField("day", new Date().getDay());

@@ -7,8 +7,10 @@ import { config } from '../../../config';
 export const uploadFile = async (req, res, next): Promise<void> => {
   try {
     if(req.file) {
+      const fileName = new Date().getTime() + req.file.originalname;
+      
       const fileService = new FileService();
-      await fileService.uploadFile(req.file.originalname);
+      await fileService.uploadFile(req.file.fileName);
       InfluxDbController.getInstance().initInfluxDB()
       await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createFileData)
       res.status(HttpStatusCode.CREATED).json({

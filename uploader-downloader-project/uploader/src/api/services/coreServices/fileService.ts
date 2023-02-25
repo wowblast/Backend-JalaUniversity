@@ -9,9 +9,7 @@ import { RabbitMqController } from "../../Infrastructure/rabbitmq/rabbitMQcontro
 export class FileService {
   async uploadFile(filename: string) {
     const gridFsManager = GridFsManager.getInstance();
-    console.log("filename ", filename);
     await gridFsManager.updateFileStatus(filename, statusTypes.pending);
-
     const fileFound = await gridFsManager.getFile(filename);
     this.uploadFilesFromLocal(fileFound.filename);
   }

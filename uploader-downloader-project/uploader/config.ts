@@ -17,5 +17,11 @@ export const config = {
         createFileData: 'creaate file',
         deleteFile: 'delete file',
         deleteAccount: 'delete account'
+    },
+    googleDriveActionTypes: {
+        createAccount: 'create Account',
+        createFile: 'create File',
+        deleteAccount: 'delete Account',
+        deleteFile: 'delete File'
     }
 }

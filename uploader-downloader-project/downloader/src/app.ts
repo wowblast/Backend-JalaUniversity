@@ -6,8 +6,8 @@ import { RabbitMqController } from "./api/infraestructure/rabbitMQ/rabbitMQcontr
 const port = "3002";
 
 app.listen(port, async () => {
-  await SingletonAppDataSource.getInstance().intiazilateAppDataSource();
-
+  const dataSource = SingletonAppDataSource.getInstance();
+  await dataSource.intiazilateAppDataSource();
   await RabbitMqController.getInstance().initializateRabbitMQ();
 
 

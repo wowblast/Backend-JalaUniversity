@@ -1,7 +1,6 @@
 import multer from "multer";
 import { GridFsStorage } from "multer-gridfs-storage";
 import { MongoRepository } from "typeorm";
-import { AppDataSource } from "./datasource";
 import { FileData } from "./entities/fileData";
 import { FileChunk } from "./entities/fileChunk";
 import { MongoClient, GridFSBucket, ObjectId } from "mongodb";
@@ -10,6 +9,7 @@ import { File } from "../../services/entities/file";
 import { FileMapper } from "../mappers/fileMapper";
 import { GoogleDriveManager } from "../googledrive/googledriveManager";
 import { statusTypes } from "../../types/statusTypes";
+import { SingletonAppDataSource } from "./datasource";
 
 export class GridFsManager {
   private bucket: GridFSBucket;
@@ -20,6 +20,7 @@ export class GridFsManager {
 
   private repository: MongoRepository<FileData>;
   private chunksRepository: MongoRepository<FileChunk>;
+  private dataSourse: SingletonAppDataSource
 
   constructor() {
     if (GridFsManager._instance) {
@@ -27,14 +28,15 @@ export class GridFsManager {
         "Error: Instantiation failed: Use RabbitMqController.getInstance() instead of new."
       );
     }
-    this.initializeMongoDB();
     GridFsManager._instance = this;
   }
 
   async initializeMongoDB() {
+    this.dataSourse = SingletonAppDataSource.getInstance();
+
     this.mongouri = "mongodb://localhost:27017";
-    this.repository = AppDataSource.getMongoRepository(FileData);
-    this.chunksRepository = AppDataSource.getMongoRepository(FileChunk);
+    this.repository = this.dataSourse.getAppDataSource().getMongoRepository(FileData);
+    this.chunksRepository = this.dataSourse.getAppDataSource().getMongoRepository(FileChunk);
 
   }
 
@@ -60,20 +62,16 @@ export class GridFsManager {
   }
 
   async getFile(filename: string): Promise<File> {
-    await AppDataSource.initialize();
     const fileFound: FileData = await this.repository.findOneBy({
       filename,
     });
-    await AppDataSource.destroy();
     return fileFound ? FileMapper.toDomainEntity(fileFound) : null;
   }
 
   async uploadFileFromGridFsToDrive(filename: string) {
-    await AppDataSource.initialize();
     const fileFound: FileData = await this.repository.findOneBy({
       filename,
     });
-    await AppDataSource.destroy();
     await this.initMongoDBconnection()
     //const innerThis = this
     await new Promise((resolve, reject) => {
@@ -99,14 +97,7 @@ export class GridFsManager {
 
   }
 
-  getData(streamdata: WritableStream) {
-    console.log("strea,", streamdata);
-  }
-
-  getFiles() {}
-
   async deleteFile(filename: string) {
-    await AppDataSource.initialize();
     const fielFounded: FileData = await this.repository.findOneBy({
       filename,
     });
@@ -115,18 +106,15 @@ export class GridFsManager {
     });
     console.log("delted file", fielFounded);
     await this.repository.deleteOne(fielFounded);
-    await AppDataSource.destroy();
     return fielFounded;
   }
 
   async updateFileStatus(filename: string, status: string) {
-    await AppDataSource.initialize();
     const file: FileData = await this.repository.findOneBy({
       filename,
     });
     file.status = status;
     await this.repository.save(file);
-    await AppDataSource.destroy();
   }
 
   public static getInstance(): GridFsManager {
@@ -136,8 +124,9 @@ export class GridFsManager {
 const storage = new GridFsStorage({
   url: "mongodb://127.0.0.1:27017/uploader",
   file: (req, file) => {
+    file.fileName=  new Date().getTime() + file.originalname
     return new Promise((resolve, reject) => {
-      const filename = file.originalname;
+      const filename = file.fileName;
       const fileInfo = {
         filename,
         bucketName: "uploads",
