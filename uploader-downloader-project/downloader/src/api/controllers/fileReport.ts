@@ -38,6 +38,7 @@ export const createFiletReport = async (req, res): Promise<void> => {
     fileReport.dateReport = req.body.dateReport;
     fileReport.downloadedAmountInBytes = req.body.downloadedAmountInBytes;
     fileReport.downloadedFilesAmount = req.body.downloadedFilesAmount;
+    fileReport.email = req.body.email;
     await fileReportService.createNewReport(fileReport);
     InfluxDbController.getInstance().initInfluxDB()
     await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountReport);

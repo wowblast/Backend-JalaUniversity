@@ -13,14 +13,21 @@ export class GoogleDriveRepositoryImplementation
   constructor() {
     this.repository = SingletonAppDataSource.getInstance().getAppDataSource().getRepository(GoogleDriveFileEntity);
   }
+
   async insertFile(googleDriveFile: GoogleDriveFile): Promise<void> {
     const googleDriveFileEntity =
       GoogleDriveFileMapper.toMongoEntity(googleDriveFile);
     await this.repository.save(googleDriveFileEntity);
   }
+
   async deleteFile(fileName: string): Promise<void> {
     await this.repository.delete({ fileName });
   }
+  
+  async deleteFileByEmail(email: string) {
+    await this.repository.delete({ email });
+  }
+
   async getFile(fileName: string): Promise<GoogleDriveFile[]> {
     const googleDriveFileEntities: GoogleDriveFileEntity[] =
       await this.repository.findBy({ fileName });
@@ -28,6 +35,7 @@ export class GoogleDriveRepositoryImplementation
       GoogleDriveFileMapper.toDomainEntity(file)
     ): [];
   }
+
   async updateFile(fileName: string, newFileName: string): Promise<void> {
     await this.repository.update({ fileName }, { fileName: newFileName });
   }

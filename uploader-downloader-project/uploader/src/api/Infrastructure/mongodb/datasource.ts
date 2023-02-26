@@ -7,7 +7,6 @@ import { GoogleDriveFileEntity } from "./entities/googleDriveFileEntity";
 export class SingletonAppDataSource {
   private static instance: SingletonAppDataSource;
   private AppDataSource = new DataSource({
-    useUnifiedTopology: true,
     type: "mongodb",
     host: "localhost",
     port: 27017,

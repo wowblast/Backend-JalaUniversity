@@ -16,4 +16,7 @@ export class FileReportEntity {
 
     @Column()
     downloadedAmountInBytes: number
+
+    @Column()
+    email: string
 }

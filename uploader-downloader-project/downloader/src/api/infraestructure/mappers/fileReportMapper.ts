@@ -8,6 +8,7 @@ export class FileReportMapper {
       fileReport.dateReport = fileReportEntity.dateReport;
       fileReport.downloadedAmountInBytes = fileReportEntity.downloadedAmountInBytes;
       fileReport.downloadedFilesAmount = fileReportEntity.downloadedFilesAmount;
+      fileReport.email = fileReportEntity.email;
       return fileReport;
     }
   
@@ -18,6 +19,7 @@ export class FileReportMapper {
       fileReportEntity.dateReport = fileReport.dateReport;
       fileReportEntity.downloadedAmountInBytes = fileReport.downloadedAmountInBytes;
       fileReportEntity.downloadedFilesAmount = fileReport.downloadedFilesAmount;
+      fileReportEntity.email = fileReport.email
       return fileReportEntity;
     }
   }

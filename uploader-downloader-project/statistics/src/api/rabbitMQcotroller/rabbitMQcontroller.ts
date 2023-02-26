@@ -108,6 +108,7 @@ export class RabbitMqController {
     fileReport.downloadedFilesAmount = 1;
     fileReport.fileName = message.fileName;
     fileReport.dateReport = todayDate;
+    fileReport.email = message.email;
 
     await this.createAccountReport(accountReport);
     await this.createFileReport(fileReport);

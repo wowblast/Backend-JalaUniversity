@@ -71,7 +71,7 @@ export const updateFile = async (req, res, next): Promise<void> => {
    
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
-      message: 'File name update in progress'
+      message: 'File name update in progress if exist'
     });
   } catch (err) {
     next(err);

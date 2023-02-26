@@ -60,6 +60,15 @@ export class FileReportRepositoryImplementation
       : [];
   }
 
+  async getFileReportByEmail(email: string): Promise<FileReport[]> {    
+    const fileReportsFounded = await this.repository.findBy({ email });
+    return fileReportsFounded
+      ? fileReportsFounded.map((fileReport) =>
+          FileReportMapper.toDomainEntity(fileReport)
+        )
+      : [];
+  }
+
   async updateFilenameOfReports(fileName: string, newFileName: string) {
     await this.repository.update({ fileName }, { fileName: newFileName });
   }

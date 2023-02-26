@@ -38,5 +38,9 @@ export class AccountReportRepositoryImplementation implements AccountReportRepos
         const accountReportsFound = await this.repository.findBy({email});
         return accountReportsFound ? accountReportsFound.map(accountReport => AccountReportMapper.toDomainEntity(accountReport)) : [];
     }
+    async upateAccountReport(accountReport: AccountReport): Promise<void> {
+        const accountReportEntity = AccountReportMapper.toMongoEntity(accountReport);
+        await this.repository.update( {id: accountReport.id}, {...accountReportEntity});
+    }
   
 }

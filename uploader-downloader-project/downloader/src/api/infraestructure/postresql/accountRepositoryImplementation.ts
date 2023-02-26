@@ -37,7 +37,7 @@ export class AccountRepositoryImplementation implements AccountRepository {
       return AccountMapper.toDomainEntity(lestUsedAccount[0]);
     }
     async updateAccount(account: Account): Promise<void> {
-        const accountDB = await this.repository.findOneByOrFail({
+        const accountDB = await this.repository.findOneBy({
             email: account.email
           });
         accountDB.id = account.id;

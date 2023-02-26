@@ -5,7 +5,7 @@ import { GoogleDriveFileRepositoryImplementation } from "../../Infrastructure/mo
 import { GoogleDriveFile } from "../entities/googleDriveFile";
 import { GoogleDriveManager } from "../../Infrastructure/googledrive/googledriveManager";
 import { RabbitMqController } from "../../Infrastructure/rabbitmq/rabbitMQcontroller";
-import { GoogleDriveAction } from '../../Infrastructure/googledrive/googleDriveAction';
+import { GoogleDriveAction } from "../../Infrastructure/googledrive/googleDriveAction";
 import { config } from "../../../../config";
 
 export class FileService {
@@ -19,11 +19,11 @@ export class FileService {
     const gridFsManager = GridFsManager.getInstance();
     const googleDriveManager = GoogleDriveManager.getInstance();
     console.log("START UPLOADING...");
-    const googleDriveAction : GoogleDriveAction = {
+    const googleDriveAction: GoogleDriveAction = {
       method: config.googleDriveActionTypes.createFile,
-      file: fileData
-    }
-    await googleDriveManager.manageGoogleDriveService(googleDriveAction)
+      file: fileData,
+    };
+    await googleDriveManager.manageGoogleDriveService(googleDriveAction);
     console.log("ENDING UPLOADING... UPDATING STATUS");
     await gridFsManager.updateFileStatus(fileData.filename, statusTypes.ready);
   }
@@ -48,11 +48,11 @@ export class FileService {
     const gridFsManager = GridFsManager.getInstance();
     const googleDriveManager = GoogleDriveManager.getInstance();
 
-    const fileFound = await gridFsManager.getFile(fileName)
+    const fileFound = await gridFsManager.getFile(fileName);
     const googleDriveAction: GoogleDriveAction = {
       method: config.googleDriveActionTypes.deleteFile,
-      file:fileFound
-    }
+      file: fileFound,
+    };
     googleDriveManager.manageGoogleDriveService(googleDriveAction);
   }
 
@@ -76,7 +76,7 @@ export class FileService {
     googleDriveFile: GoogleDriveFile
   ) {
     if (googleDriveFile) {
-      console.log("message")
+      console.log("message");
       const message = {
         method: method,
         file: googleDriveFile,
@@ -89,37 +89,19 @@ export class FileService {
 
   async updateFileFromServices(googleDriveAction: GoogleDriveAction) {
     const googleDriveManager = GoogleDriveManager.getInstance();
-    const gridFsManager = GridFsManager.getInstance();
-    
-   /* const googleDriveFiles =
-      await googleDriveFileRepositoryImplementation.getFile(fileName);
-      await googleDriveManager.updateAccount(
-        googleDriveFiles
-      );
-      await googleDriveFileRepositoryImplementation.deleteFile(fileName);
-      await gridFsManager.deleteFile(fileName);
-      await this.sendFilesToDownloader("delete", googleDriveFiles[0]);*/
-          googleDriveManager.manageGoogleDriveService(googleDriveAction);
-
-      
-      
+    googleDriveManager.manageGoogleDriveService(googleDriveAction);
   }
 
   async updateFile(fileName: string, newFileName: string) {
     const gridFsManager = GridFsManager.getInstance();
-    const fileFound =
-      await gridFsManager.getFile(fileName);
-    console.log("filñename ", fileName, "NEWF ", newFileName)
-    const googleDriveAction: GoogleDriveAction = {
-      method: config.googleDriveActionTypes.updateFile,
-      file:fileFound,
-      newFileName: newFileName
+    const fileFound = await gridFsManager.getFile(fileName);
+    if (fileFound) {
+      const googleDriveAction: GoogleDriveAction = {
+        method: config.googleDriveActionTypes.updateFile,
+        file: fileFound,
+        newFileName: newFileName,
+      };
+      this.updateFileFromServices(googleDriveAction);
     }
-    console.log(googleDriveAction)
-    this.updateFileFromServices(googleDriveAction)
-    //update drive
-    //update mongo normal
-    //update chunks
-    //update mensaje
   }
 }

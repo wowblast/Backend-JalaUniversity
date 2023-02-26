@@ -9,6 +9,11 @@ import { MessageData } from "../../services/interfaces/messageData";
 import { InfluxDbController } from "../../influxDBController/influxDBcontroller";
 import { config } from "../../../../config";
 import { FileDataRepositoryImplementation } from "../postresql/fileDataRepositoryImplementation";
+import { FileReportRepositoryImplementation } from "../postresql/fileReportRepositoryImplementation";
+import { FileReportEntity } from "../postresql/entities/fileReportEntity";
+import { FileReport } from "../../services/entities/fileReport";
+import { AccountReportRepositoryImplementation } from "../postresql/accountReportRepositoryImplementation";
+import { AccountRepositoryImplementation } from "../postresql/accountRepositoryImplementation";
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -83,14 +88,11 @@ export class RabbitMqController {
   }
 
   public async manageMessages() {
-    //const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     if (this.isMessagesManagerReady) {
       InfluxDbController.getInstance().initInfluxDB();
       this.isMessagesManagerReady = false;
       while (true) {
-        //await sleep(5000);
         let currentMesages = this.messages;
-        //console.log("done ", currentMesages[0]);
         console.log("messages remainign", currentMesages);
         const message: MessageData = JSON.parse(currentMesages[0]);
         switch (message.method) {
@@ -106,6 +108,7 @@ export class RabbitMqController {
             );
             break;
           case "delete":
+            await this.deleteFileNameFromReports(message.file.fileName);
             await this.deleteGoogleDriveFile(message.file as GoogleDriveFile);
             await this.deleteFileData(message.file.fileName);
             await InfluxDbController.getInstance().saveActionStatus(
@@ -120,10 +123,19 @@ export class RabbitMqController {
               message.file.fileName,
               message.newFileName
             );
+            await this.updateFileDataName(
+              message.file.fileName,
+              message.newFileName
+            );
             await this.updateFileNameOnReports(
               message.file.fileName,
               message.newFileName
             );
+            break;
+          case "delete account":
+            await this.deleteAccountFromReports(message.file.email);
+            await this.deleteGoogleDriveFilesByEmail(message.file.email);
+            await this.deleteAccountData(message.file.email);
             break;
           default:
             break;
@@ -148,6 +160,94 @@ export class RabbitMqController {
     const fileDataService = new FileDataService();
     await fileDataService.deleteFileData(fileName);
   }
+
+  async getFileReportsByName(fileName: string) {
+    const fileReportRepositoryImplementation: FileReportRepositoryImplementation =
+      new FileReportRepositoryImplementation();
+    return await fileReportRepositoryImplementation.getFileReportByFileName(
+      fileName
+    );
+  }
+
+  async updateFileReportOnAccount(fileReport: FileReport) {
+    const accountReportRepositoryImplementation: AccountReportRepositoryImplementation =
+      new AccountReportRepositoryImplementation();
+    const accountReport =
+      await accountReportRepositoryImplementation.getAccountReportByDateAndEmail(
+        fileReport.dateReport,
+        fileReport.email
+      );
+    accountReport.downloadedAmountInBytes -= fileReport.downloadedAmountInBytes;
+    accountReport.downloadedFilesAmount -= fileReport.downloadedFilesAmount;
+    if (accountReport.downloadedAmountInBytes <= 0) {
+      await accountReportRepositoryImplementation.deleteAccountReport(
+        accountReport.id
+      );
+    } else {
+      await accountReportRepositoryImplementation.upateAccountReport(
+        accountReport
+      );
+    }
+  }
+
+  async updateAccountDownloadData(fileReport: FileReport) {
+    const accountRepositoryImplementation: AccountRepositoryImplementation =
+      new AccountRepositoryImplementation();
+    const accountFound = await accountRepositoryImplementation.getAccount(
+      fileReport.email
+    );
+    accountFound.downloadedData -= fileReport.downloadedAmountInBytes;
+    await accountRepositoryImplementation.updateAccount(accountFound);
+  }
+
+  async deleteFileNameFromReports(fileName: string) {
+    const reports = await this.getFileReportsByName(fileName);
+    for (let index = 0; index < reports.length; index++) {
+      await this.updateAccountDownloadData(reports[index]);
+      await this.updateFileReportOnAccount(reports[index]);
+      await this.deleteFileReport(reports[index]);
+    }
+  }
+
+  async deleteGoogleDriveFilesByEmail(email: string) {
+    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation =
+      new GoogleDriveRepositoryImplementation();
+    await googleDriveRepositoryImplementation.deleteFileByEmail(email);
+  }
+
+  async deleteAccountData(email: string) {
+    const accountRepositoryImplementation: AccountRepositoryImplementation =
+      new AccountRepositoryImplementation();
+    const accountFound = await accountRepositoryImplementation.getAccount(
+      email
+    );
+    if (accountFound)
+      await accountRepositoryImplementation.deleteAccount(email);
+  }
+
+  async deleteFileReport(fileReport: FileReport) {
+    const fileReportRepositoryImplementation: FileReportRepositoryImplementation =
+      new FileReportRepositoryImplementation();
+    await fileReportRepositoryImplementation.deleteFileReport(fileReport.id);
+  }
+
+  async deleteAccountFromReports(email: string) {
+    const fileReportRepositoryImplementation: FileReportRepositoryImplementation =
+      new FileReportRepositoryImplementation();
+    const fileReports =
+      await fileReportRepositoryImplementation.getFileReportByEmail(email);
+    for (let index = 0; index < fileReports.length; index++) {
+      await this.updateFileDownloadData(fileReports[index]);
+      await this.deleteFileReport(fileReports[index]);
+    }
+  }
+
+  async updateFileDownloadData(report: FileReport) {
+    const fileDataService = new FileDataService();
+    const fileData = await fileDataService.getFileData(report.fileName);
+    fileData.downloadedData -= report.downloadedAmountInBytes;
+  }
+
   async createGoogleDrive(file: GoogleDriveFile) {
     const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation =
       new GoogleDriveRepositoryImplementation();
@@ -170,17 +270,25 @@ export class RabbitMqController {
     await fileDataService.insertFileIfNewFile(newFileData);
   }
 
-  async updateFileNameOnReports(fileName: string, newFileName: string) {
+  async updateFileDataName(fileName: string, newFileName: string) {
     const fileDataRepositoryImplementation: FileDataRepositoryImplementation =
       new FileDataRepositoryImplementation();
     const fileDataFound = await fileDataRepositoryImplementation.getFileData(
       fileName
     );
-    console.log("befreo update", fileDataFound)
     if (fileDataFound) {
       fileDataFound.fileName = newFileName;
       await fileDataRepositoryImplementation.updateFileData(fileDataFound);
     }
+  }
+
+  async updateFileNameOnReports(fileName: string, newFileName: string) {
+    const fileReportRepositoryImplementation: FileReportRepositoryImplementation =
+      new FileReportRepositoryImplementation();
+    await fileReportRepositoryImplementation.updateFilenameOfReports(
+      fileName,
+      newFileName
+    );
   }
   async updateFileNameOnGoogleDrive(fileName: string, newFileName: string) {
     const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation =

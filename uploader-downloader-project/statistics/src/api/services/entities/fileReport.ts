@@ -4,4 +4,5 @@ export class FileReport {
     dateReport: string
     downloadedFilesAmount: number
     downloadedAmountInBytes: number
+    email: string
 }
