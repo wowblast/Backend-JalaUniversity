@@ -4,4 +4,5 @@ export interface GoogleDriveFileRepository {
     deleteFile(fileName: string): Promise<void>;
     getFile(fileName: string): Promise<GoogleDriveFile[]>;
     updateFile(fileName: string, newfIleName: string): Promise<void>;
+    getFileByEmailAndFileName(email:string, fileName: string): Promise<GoogleDriveFile>;
 }

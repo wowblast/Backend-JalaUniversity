@@ -38,5 +38,5 @@ export class AccountReportRepositoryImplementation implements AccountReportRepos
         const accountReportsFound = await this.repository.findBy({email});
         return accountReportsFound ? accountReportsFound.map(accountReport => AccountReportMapper.toDomainEntity(accountReport)) : [];
     }
-    
+  
 }

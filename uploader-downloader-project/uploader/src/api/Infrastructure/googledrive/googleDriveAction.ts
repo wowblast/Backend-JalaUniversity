@@ -1,5 +1,6 @@
-import { FileData } from '../mongodb/entities/fileData';
+import { File } from "../../services/entities/file"
 export interface GoogleDriveAction {
     method: string,
-    file: FileData
+    file: File
+    newFileName?: string
 }

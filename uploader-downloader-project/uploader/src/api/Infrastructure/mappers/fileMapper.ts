@@ -11,5 +11,5 @@ export class FileMapper {
         file.status = fileData.status
         file.uploadDate = fileData.uploadDate
         return file
-    }
+    }  
 }

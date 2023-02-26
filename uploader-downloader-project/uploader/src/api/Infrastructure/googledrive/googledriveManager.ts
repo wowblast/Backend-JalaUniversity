@@ -11,11 +11,14 @@ import { statusTypes } from "../../types/statusTypes";
 import { RabbitMqController } from "../rabbitmq/rabbitMQcontroller";
 import { GoogleDriveAction } from "./googleDriveAction";
 import { config } from "../../../../config";
+import { File } from "../../services/entities/file";
+import { FileService } from "../../services/coreServices/fileService";
 export class GoogleDriveManager {
   private static _instance: GoogleDriveManager = new GoogleDriveManager();
   private accountRepository: AccountRepositoryImplementation;
   private accounts: Account[];
   private drive;
+  private gridFsManager: GridFsManager;
   private files: Array<FileData> = new Array();
   private googleDriveActions: Array<GoogleDriveAction> = new Array();
   private isGoogleDriveManagerReady = true;
@@ -31,34 +34,25 @@ export class GoogleDriveManager {
 
   async initializeGoogleDriveManager() {
     this.accountRepository = new AccountRepositoryImplementation();
+    this.gridFsManager = GridFsManager.getInstance();
   }
 
-  public async uploadFileToGoogleDrive(fileData: FileData) {
-    this.files.push(fileData);
-    if (this.isUploaderReady) {
-      this.isUploaderReady = false;
-      while (true) {
-        this.accounts = await this.accountRepository.getAllAccounts();
-        let currentFiles: Array<FileData> = this.files;
-        console.log("files remaining ", this.files);
-        for (let index = 0; index < this.accounts.length; index++) {
-          await this.createFile(this.accounts[index], currentFiles[0]);
-          console.log("done on " + this.accounts[index].email);
-        }
-        console.log("done file  ", currentFiles[0].filename);
-        fs.unlinkSync(
-          "./src/api/Infrastructure/mongodb/outtest/" + currentFiles[0].filename
-        );
-        this.files.shift();
-        if (this.files.length == 0) {
-          break;
-        }
-      }
-      this.isUploaderReady = true;
+  public async uploadFileToGoogleDrive(fileData: File) {
+    await this.gridFsManager.downloadFileFromGridFsToTempFolder(
+      fileData.filename
+    );
+    this.accounts = await this.accountRepository.getAllAccounts();
+    //  let currentFiles: Array<FileData> = this.files;
+    for (let index = 0; index < this.accounts.length; index++) {
+      await this.createFile(this.accounts[index], fileData);
+      console.log("done on " + this.accounts[index].email);
     }
+    console.log("done file  ", fileData.filename);
+    fs.unlinkSync(
+      "./src/api/Infrastructure/mongodb/outtest/" + fileData.filename
+    );
   }
-
-  async createFile(account: Account, fileData: FileData) {
+  setAccountCredentials(account: Account) {
     const authGoogle = new google.auth.OAuth2(
       account.clientId,
       account.clientSecret,
@@ -69,6 +63,11 @@ export class GoogleDriveManager {
       version: "v3",
       auth: authGoogle,
     });
+  }
+
+  async createFile(account: Account, fileData: File) {
+    this.setAccountCredentials(account);
+
     const filePath = path.join(
       "./src/api/Infrastructure/mongodb/outtest/",
       fileData.filename
@@ -86,7 +85,7 @@ export class GoogleDriveManager {
     await this.generateDownLoadLinks(response.data.id, fileData, account.email);
   }
 
-  async generateDownLoadLinks(id: string, fileData: FileData, email: string) {
+  async generateDownLoadLinks(id: string, fileData: File, email: string) {
     await this.drive.permissions.create({
       fileId: id,
       requestBody: {
@@ -105,9 +104,9 @@ export class GoogleDriveManager {
     googleDriveFile.email = email;
     googleDriveFile.fileName = fileData.filename;
     googleDriveFile.fileId = id;
-    googleDriveFile.fileSize = parseInt(fileData.length);
+    googleDriveFile.fileSize = parseInt(fileData.size);
     await this.saveGoogleDriveFileOnDataBase(googleDriveFile);
-    await this.sendFilesToDownloader(googleDriveFile);
+    await this.sendFilesToDownloader(googleDriveFile, 'create');
   }
 
   async saveGoogleDriveFileOnDataBase(googleDriveFile: GoogleDriveFile) {
@@ -116,10 +115,11 @@ export class GoogleDriveManager {
     await googleDriveFileRepositoryImplementation.insertFile(googleDriveFile);
   }
 
-  async sendFilesToDownloader(googleDriveFile: GoogleDriveFile) {
+  async sendFilesToDownloader(googleDriveFile: GoogleDriveFile,method: string, newFileName?: string) {
     const message = {
-      method: "create",
+      method: method,
       file: googleDriveFile,
+      newFileName
     };
     await RabbitMqController.getInstance().sendMessage(JSON.stringify(message));
   }
@@ -160,19 +160,26 @@ export class GoogleDriveManager {
       this.isGoogleDriveManagerReady = false;
       while (true) {
         let currentActions: Array<GoogleDriveAction> = this.googleDriveActions;
-        console.log("actions remaining",  this.googleDriveActions);  
+        console.log("actions remaining", this.googleDriveActions);
         switch (currentActions[0].method) {
           case config.googleDriveActionTypes.createAccount:
             break;
           case config.googleDriveActionTypes.createFile:
-          break;
+            await this.uploadFileToGoogleDrive(currentActions[0].file);
+            break;
           case config.googleDriveActionTypes.deleteAccount:
-          break;
+            break;
           case config.googleDriveActionTypes.deleteFile:
-          break;        
+            const fileService = new FileService();
+            await fileService.deleteFileFromServices(
+              currentActions[0].file.filename
+            );
+            break;
+          case config.googleDriveActionTypes.updateFile:
+            await this.updateFileName(googleDriveAction);
           default:
             break;
-        }    
+        }
         this.googleDriveActions.shift();
         if (this.googleDriveActions.length == 0) {
           break;
@@ -181,6 +188,39 @@ export class GoogleDriveManager {
       this.isGoogleDriveManagerReady = true;
       console.log("ready to google drive actions");
     }
+  }
+
+  async updateFileName(googleDriveAction: GoogleDriveAction) {
+    this.accounts = await this.accountRepository.getAllAccounts();
+    const googleDriveFileRepositoryImplementation: GoogleDriveFileRepositoryImplementation =
+      new GoogleDriveFileRepositoryImplementation();
+    for (let index = 0; index < this.accounts.length; index++) {
+      this.setAccountCredentials(this.accounts[index]);
+      const googleDrivefile =
+        await googleDriveFileRepositoryImplementation.getFileByEmailAndFileName(
+          this.accounts[index].email,
+          googleDriveAction.file.filename
+        );
+      await this.updateFileNameOnGoogleDriveAccount(
+        googleDriveAction,
+        googleDrivefile
+      );
+      await this.sendFilesToDownloader(googleDrivefile,'update file',googleDriveAction.newFileName );
+      console.log("done on " + this.accounts[index].email);
+    }
+    await googleDriveFileRepositoryImplementation.updateFile(googleDriveAction.file.filename, googleDriveAction.newFileName );
+    await this.gridFsManager.updateFileName(googleDriveAction.file.filename, googleDriveAction.newFileName );
+  }
+
+  async updateFileNameOnGoogleDriveAccount(
+    googleDriveAction: GoogleDriveAction,
+    googleDrivefile: GoogleDriveFile
+  ) {
+    console.log("updating to  ",googleDrivefile.fileId, " ", googleDriveAction.newFileName )
+    await this.drive.files.update({
+      fileId: googleDrivefile.fileId,
+      resource: { name: googleDriveAction.newFileName },
+    });
   }
 
   public static getInstance(): GoogleDriveManager {

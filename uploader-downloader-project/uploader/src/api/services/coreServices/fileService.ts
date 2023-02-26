@@ -5,20 +5,27 @@ import { GoogleDriveFileRepositoryImplementation } from "../../Infrastructure/mo
 import { GoogleDriveFile } from "../entities/googleDriveFile";
 import { GoogleDriveManager } from "../../Infrastructure/googledrive/googledriveManager";
 import { RabbitMqController } from "../../Infrastructure/rabbitmq/rabbitMQcontroller";
+import { GoogleDriveAction } from '../../Infrastructure/googledrive/googleDriveAction';
+import { config } from "../../../../config";
 
 export class FileService {
   async uploadFile(filename: string) {
     const gridFsManager = GridFsManager.getInstance();
     await gridFsManager.updateFileStatus(filename, statusTypes.pending);
     const fileFound = await gridFsManager.getFile(filename);
-    this.uploadFilesFromLocal(fileFound.filename);
+    this.uploadFilesFromLocal(fileFound);
   }
-  async uploadFilesFromLocal(filename: string) {
+  async uploadFilesFromLocal(fileData: File) {
     const gridFsManager = GridFsManager.getInstance();
+    const googleDriveManager = GoogleDriveManager.getInstance();
     console.log("START UPLOADING...");
-    await gridFsManager.uploadFileFromGridFsToDrive(filename);
+    const googleDriveAction : GoogleDriveAction = {
+      method: config.googleDriveActionTypes.createFile,
+      file: fileData
+    }
+    await googleDriveManager.manageGoogleDriveService(googleDriveAction)
     console.log("ENDING UPLOADING... UPDATING STATUS");
-    await gridFsManager.updateFileStatus(filename, statusTypes.ready);
+    await gridFsManager.updateFileStatus(fileData.filename, statusTypes.ready);
   }
 
   async getFile(filename: string): Promise<[File, GoogleDriveFile[]]> {
@@ -38,6 +45,18 @@ export class FileService {
   }
 
   async deleteFile(fileName: string) {
+    const gridFsManager = GridFsManager.getInstance();
+    const googleDriveManager = GoogleDriveManager.getInstance();
+
+    const fileFound = await gridFsManager.getFile(fileName)
+    const googleDriveAction: GoogleDriveAction = {
+      method: config.googleDriveActionTypes.deleteFile,
+      file:fileFound
+    }
+    googleDriveManager.manageGoogleDriveService(googleDriveAction);
+  }
+
+  async deleteFileFromServices(fileName: string) {
     const googleDriveManager = GoogleDriveManager.getInstance();
     const gridFsManager = GridFsManager.getInstance();
     const googleDriveFileRepositoryImplementation: GoogleDriveFileRepositoryImplementation =
@@ -68,7 +87,36 @@ export class FileService {
     }
   }
 
-  async updateFile(fileName: string) {
+  async updateFileFromServices(googleDriveAction: GoogleDriveAction) {
+    const googleDriveManager = GoogleDriveManager.getInstance();
+    const gridFsManager = GridFsManager.getInstance();
+    
+   /* const googleDriveFiles =
+      await googleDriveFileRepositoryImplementation.getFile(fileName);
+      await googleDriveManager.updateAccount(
+        googleDriveFiles
+      );
+      await googleDriveFileRepositoryImplementation.deleteFile(fileName);
+      await gridFsManager.deleteFile(fileName);
+      await this.sendFilesToDownloader("delete", googleDriveFiles[0]);*/
+          googleDriveManager.manageGoogleDriveService(googleDriveAction);
+
+      
+      
+  }
+
+  async updateFile(fileName: string, newFileName: string) {
+    const gridFsManager = GridFsManager.getInstance();
+    const fileFound =
+      await gridFsManager.getFile(fileName);
+    console.log("filñename ", fileName, "NEWF ", newFileName)
+    const googleDriveAction: GoogleDriveAction = {
+      method: config.googleDriveActionTypes.updateFile,
+      file:fileFound,
+      newFileName: newFileName
+    }
+    console.log(googleDriveAction)
+    this.updateFileFromServices(googleDriveAction)
     //update drive
     //update mongo normal
     //update chunks

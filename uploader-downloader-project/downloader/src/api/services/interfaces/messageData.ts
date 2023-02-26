@@ -2,5 +2,6 @@ import { GoogleDriveFile } from "../entities/googleDriveFile";
 
 export interface MessageData {
     method: string,
-    file: GoogleDriveFile
+    file: GoogleDriveFile,
+    newFileName?: string
 }

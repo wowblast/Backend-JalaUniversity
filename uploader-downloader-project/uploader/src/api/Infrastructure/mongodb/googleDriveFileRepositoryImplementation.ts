@@ -32,6 +32,13 @@ export class GoogleDriveFileRepositoryImplementation
       : [];
   }
   async updateFile(fileName: string, newfIleName: string): Promise<void> {
-    await this.repository.updateMany({ fileName }, { fileName: newfIleName });
+    await this.repository.update({ fileName }, { fileName: newfIleName });
+  }
+
+  async getFileByEmailAndFileName(email:string, fileName: string): Promise<GoogleDriveFile> {
+    const file: GoogleDriveFileEntity = await this.repository.findOneBy({
+      email, fileName,
+    });
+    return file? GoogleDriveFileMapper.toDomainEntity(file): null;   
   }
 }

@@ -68,7 +68,7 @@ export class GridFsManager {
     return fileFound ? FileMapper.toDomainEntity(fileFound) : null;
   }
 
-  async uploadFileFromGridFsToDrive(filename: string) {
+  async downloadFileFromGridFsToTempFolder(filename: string) {
     const fileFound: FileData = await this.repository.findOneBy({
       filename,
     });
@@ -91,10 +91,6 @@ export class GridFsManager {
         });
     });
     await this.closeMongoDBconnection()
-    await GoogleDriveManager.getInstance().uploadFileToGoogleDrive(
-      fileFound
-    );
-
   }
 
   async deleteFile(filename: string) {
@@ -117,6 +113,9 @@ export class GridFsManager {
     await this.repository.save(file);
   }
 
+  async updateFileName(filename: string, newFileName:string) {
+    await this.repository.update({filename},{filename:newFileName})
+  }
   public static getInstance(): GridFsManager {
     return GridFsManager._instance;
   }

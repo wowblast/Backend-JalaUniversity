@@ -22,6 +22,7 @@ export const config = {
         createAccount: 'create Account',
         createFile: 'create File',
         deleteAccount: 'delete Account',
-        deleteFile: 'delete File'
+        deleteFile: 'delete File',
+        updateFile: 'update File'
     }
 }

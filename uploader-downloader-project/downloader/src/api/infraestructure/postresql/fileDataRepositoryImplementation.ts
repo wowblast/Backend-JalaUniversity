@@ -24,12 +24,8 @@ export class FileDataRepositoryImplementation implements FileDataRepository {
           return fileDatFound
     }
     async updateFileData(fileData: FileData): Promise<void> {
-        const fileDataFound = await this.repository.findOneBy({
-            fileName: fileData.fileName
-          });
-          fileDataFound.id = fileData.id;
-          fileDataFound.downloadedData = fileData.downloadedData;
-        await this.repository.save(fileDataFound);
+      
+        await this.repository.save(FileDataMapper.toMongoEntity(fileData));
     }
     
 }

@@ -7,7 +7,8 @@ import { FileDataService } from "../../services/coreServices/fileDataService";
 import { FileData } from "../../services/entities/fileData";
 import { MessageData } from "../../services/interfaces/messageData";
 import { InfluxDbController } from "../../influxDBController/influxDBcontroller";
-import { config } from '../../../../config';
+import { config } from "../../../../config";
+import { FileDataRepositoryImplementation } from "../postresql/fileDataRepositoryImplementation";
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -67,7 +68,6 @@ export class RabbitMqController {
   public async sendMessage(message: string) {
     console.log("sent message tpe ", typeof message, message);
 
-
     try {
       this.channel.sendToQueue(this.statisticsChannel, Buffer.from(message));
     } catch (error) {
@@ -85,7 +85,7 @@ export class RabbitMqController {
   public async manageMessages() {
     //const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     if (this.isMessagesManagerReady) {
-      InfluxDbController.getInstance().initInfluxDB()
+      InfluxDbController.getInstance().initInfluxDB();
       this.isMessagesManagerReady = false;
       while (true) {
         //await sleep(5000);
@@ -98,14 +98,32 @@ export class RabbitMqController {
             await this.createGoogleDrive(message.file as GoogleDriveFile);
             await this.createAccount(message.file.email);
             await this.createFileData(message.file.fileName);
-            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountInfo);
-            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createFileData);
+            await InfluxDbController.getInstance().saveActionStatus(
+              config.actionTypes.createAccountInfo
+            );
+            await InfluxDbController.getInstance().saveActionStatus(
+              config.actionTypes.createFileData
+            );
             break;
           case "delete":
             await this.deleteGoogleDriveFile(message.file as GoogleDriveFile);
             await this.deleteFileData(message.file.fileName);
-            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.deleteAccount);
-            await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.deleteFile);
+            await InfluxDbController.getInstance().saveActionStatus(
+              config.actionTypes.deleteAccount
+            );
+            await InfluxDbController.getInstance().saveActionStatus(
+              config.actionTypes.deleteFile
+            );
+            break;
+          case "update file":
+            await this.updateFileNameOnGoogleDrive(
+              message.file.fileName,
+              message.newFileName
+            );
+            await this.updateFileNameOnReports(
+              message.file.fileName,
+              message.newFileName
+            );
             break;
           default:
             break;
@@ -152,11 +170,25 @@ export class RabbitMqController {
     await fileDataService.insertFileIfNewFile(newFileData);
   }
 
+  async updateFileNameOnReports(fileName: string, newFileName: string) {
+    const fileDataRepositoryImplementation: FileDataRepositoryImplementation =
+      new FileDataRepositoryImplementation();
+    const fileDataFound = await fileDataRepositoryImplementation.getFileData(
+      fileName
+    );
+    console.log("befreo update", fileDataFound)
+    if (fileDataFound) {
+      fileDataFound.fileName = newFileName;
+      await fileDataRepositoryImplementation.updateFileData(fileDataFound);
+    }
+  }
+  async updateFileNameOnGoogleDrive(fileName: string, newFileName: string) {
+    const googleDriveRepositoryImplementation: GoogleDriveRepositoryImplementation =
+      new GoogleDriveRepositoryImplementation();
+    await googleDriveRepositoryImplementation.updateFile(fileName, newFileName);
+  }
+
   public static getInstance(): RabbitMqController {
     return RabbitMqController._instance;
   }
-
-  public getChnnael() {
-    console.log(this.channel);
-    console.log("conec", this.connection);  }
 }
