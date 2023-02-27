@@ -72,4 +72,15 @@ export class FileReportRepositoryImplementation
   async updateFilenameOfReports(fileName: string, newFileName: string) {
     await this.repository.update({ fileName }, { fileName: newFileName });
   }
+
+  async getFileReportIfExists(fileReport: FileReport) {
+    const fileReportFounded = await this.repository.findOneBy({
+      dateReport: fileReport.dateReport,
+      email: fileReport.email,
+      fileName: fileReport.fileName
+    });
+    return fileReportFounded
+      ? FileReportMapper.toDomainEntity(fileReportFounded)
+      : null;
+  }
 }

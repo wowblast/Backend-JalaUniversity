@@ -31,7 +31,7 @@ export const createAccount = async (req, res, next): Promise<void> => {
       );
       res.status(HttpStatusCode.CREATED).json({
         statusCode: HttpStatusCode.CREATED,
-        message: config.httpBasicResponses.createFile,
+        message: config.httpBasicResponses.createAccount,
       });
     }
   } catch (err) {

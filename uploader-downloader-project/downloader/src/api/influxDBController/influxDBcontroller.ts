@@ -20,7 +20,7 @@ export class InfluxDbController {
   public async saveActionStatus(actionValue: string) {
     const newPoint: Point = new Point(config.influxDbId);
     newPoint.tag("actions", actionValue);
-    newPoint.intField("day", new Date().getHours()+ (new Date().getMinutes()/100));
+    newPoint.intField("day", new Date().getHours()+ (new Date().getMinutes()/10));
     newPoint.timestamp(new Date());
     this.influxConnection.writePoint(newPoint);
     await this.influxConnection.flush();
