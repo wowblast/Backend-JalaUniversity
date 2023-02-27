@@ -33,6 +33,7 @@ export class HttpController {
       dateReport: fileReport.dateReport,
       downloadedAmountInBytes: fileReport.downloadedAmountInBytes,
       downloadedFilesAmount: fileReport.downloadedFilesAmount,
+      email: fileReport.email
     });
 
     this.httpConfig.url = config.downloaderUrl + config.fileReportUri;

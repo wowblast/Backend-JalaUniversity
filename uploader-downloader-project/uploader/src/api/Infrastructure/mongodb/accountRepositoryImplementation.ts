@@ -32,7 +32,7 @@ export class AccountRepositoryImplementation implements AccountRepository {
 
   async getAllAccounts(): Promise<Account[]> {
     const accountsFound: AccountEntity[] = await this.repository.find({});
-    return accountsFound.map(account => AccountMapper.toDomainEntity(account));
+    return accountsFound? accountsFound.map(account => AccountMapper.toDomainEntity(account)): [];
 
   }
   async updateAccount(account: Account): Promise<void> {

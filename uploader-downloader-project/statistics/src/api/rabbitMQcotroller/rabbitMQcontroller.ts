@@ -35,7 +35,7 @@ export class RabbitMqController {
         (channel: Channel) =>
         async (msg: ConsumeMessage | null): Promise<void> => {
           if (msg) {
-            console.log("message ",msg.content.toString())
+            logger.info("message "+msg.content.toString())
             this.messages.push(msg.content.toString());
             await this.manageMessages();
             channel.ack(msg);
@@ -72,7 +72,8 @@ export class RabbitMqController {
       this.isMessagesManagerReady = false;
       while (true) {
         let currentMesages = this.messages;
-        console.log("messages remainign", currentMesages);
+        logger.info("messages remainign")
+        logger.info(currentMesages);
         const message: MessageData = JSON.parse(currentMesages[0]);
         switch (message.method) {
           case "create report":
@@ -82,7 +83,6 @@ export class RabbitMqController {
             break;
         }
         this.messages.shift();
-        console.log(this.messages);
         if (this.messages.length == 0) {
           break;
         }

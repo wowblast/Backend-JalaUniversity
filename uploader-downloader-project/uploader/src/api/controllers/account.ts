@@ -14,7 +14,7 @@ export const createAccount = async (req, res, next): Promise<void> => {
     newAccount.clientSecret = req.body.clientSecret;
     newAccount.redirectUri = req.body.redirectUri;
     newAccount.refrestToken = req.body.refrestToken;
-    await accountService.InsertAccount(newAccount);
+    await accountService.insertAccount(newAccount);
     InfluxDbController.getInstance().initInfluxDB();
     await InfluxDbController.getInstance().saveActionStatus(
       config.actionTypes.createAccount
@@ -31,15 +31,25 @@ export const createAccount = async (req, res, next): Promise<void> => {
 export const removeAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
-    await accountService.DeleteAccount(req.body.email);
-    InfluxDbController.getInstance().initInfluxDB();
-    await InfluxDbController.getInstance().saveActionStatus(
-      config.actionTypes.deleteAccount
-    );
-    res.status(HttpStatusCode.OK).json({
-      statusCode: HttpStatusCode.OK,
-      message: "Account Deleted",
-    });
+    const account = await accountService.getAccount(req.body.email);
+    console.log("email to remove", account);
+
+    if (account) {
+      await accountService.deleteAccount(req.body.email);
+      InfluxDbController.getInstance().initInfluxDB();
+      await InfluxDbController.getInstance().saveActionStatus(
+        config.actionTypes.deleteAccount
+      );
+      res.status(HttpStatusCode.OK).json({
+        statusCode: HttpStatusCode.OK,
+        message: "Account Deleted",
+      });
+    } else {
+      res.status(HttpStatusCode.NOT_FOUND).json({
+        statusCode: HttpStatusCode.OK,
+        message: "Account not found",
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -55,7 +65,7 @@ export const updateAccount = async (req, res, next): Promise<void> => {
     newAccount.clientSecret = req.body.clientSecret;
     newAccount.redirectUri = req.body.redirectUri;
     newAccount.refrestToken = req.body.refrestToken;
-    await accountService.UpdateAccount(newAccount);
+    await accountService.updateAccount(newAccount);
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
       message: "Account Updated",
@@ -68,7 +78,7 @@ export const updateAccount = async (req, res, next): Promise<void> => {
 export const getAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
-    const account = await accountService.GetAccount(req.params.email);
+    const account = await accountService.getAccount(req.params.email);
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
       message: "Account Found",
@@ -82,7 +92,7 @@ export const getAccount = async (req, res, next): Promise<void> => {
 export const getAllAccounts = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
-    const accounts = await accountService.GetAllAccounts();
+    const accounts = await accountService.getAllAccounts();
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
       message: "Account Found",

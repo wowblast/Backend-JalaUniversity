@@ -13,6 +13,7 @@ import { GoogleDriveAction } from "./googleDriveAction";
 import { config } from "../../../../config";
 import { File } from "../../services/entities/file";
 import { FileService } from "../../services/coreServices/fileService";
+import { AccountService } from '../../services/coreServices/accountService';
 export class GoogleDriveManager {
   private static _instance: GoogleDriveManager = new GoogleDriveManager();
   private accountRepository: AccountRepositoryImplementation;
@@ -106,7 +107,7 @@ export class GoogleDriveManager {
     googleDriveFile.fileId = id;
     googleDriveFile.fileSize = parseInt(fileData.size);
     await this.saveGoogleDriveFileOnDataBase(googleDriveFile);
-    await this.sendFilesToDownloader(googleDriveFile, 'create');
+    await this.sendFilesToDownloader(googleDriveFile, "create");
   }
 
   async saveGoogleDriveFileOnDataBase(googleDriveFile: GoogleDriveFile) {
@@ -115,11 +116,40 @@ export class GoogleDriveManager {
     await googleDriveFileRepositoryImplementation.insertFile(googleDriveFile);
   }
 
-  async sendFilesToDownloader(googleDriveFile: GoogleDriveFile,method: string, newFileName?: string) {
+  async deleteFilesFromAccount(email: string) {
+    const accountService = new AccountService();
+    const googleDriveFilesFound = await this.getGoogleDriveFilesByEmail(email);
+    const emailAccount = await this.accountRepository.getAccount(email);
+    if (googleDriveFilesFound && emailAccount) {
+      for (let index = 0; index < googleDriveFilesFound.length; index++) {
+        await this.deleteFileOnGoogleDrive(
+          emailAccount,
+          googleDriveFilesFound[index].fileId
+        );
+      }
+      await accountService.deleteGoogleDriveFileByEmail(email);
+      await accountService.deleteAccountData(email);
+      const googleDriveFolder = new GoogleDriveFile();
+      googleDriveFolder.email = email
+      await this.sendFilesToDownloader(googleDriveFolder, 'delete account')
+    }
+  }
+
+  async getGoogleDriveFilesByEmail(email: string): Promise<GoogleDriveFile[]> {
+    const googleDriveFileRepositoryImplementation: GoogleDriveFileRepositoryImplementation =
+      new GoogleDriveFileRepositoryImplementation();
+    return await googleDriveFileRepositoryImplementation.getFilesByEmail(email);
+  }
+
+  async sendFilesToDownloader(
+    googleDriveFile: GoogleDriveFile,
+    method: string,
+    newFileName?: string
+  ) {
     const message = {
       method: method,
       file: googleDriveFile,
-      newFileName
+      newFileName,
     };
     await RabbitMqController.getInstance().sendMessage(JSON.stringify(message));
   }
@@ -141,16 +171,7 @@ export class GoogleDriveManager {
   }
 
   async deleteFileOnGoogleDrive(account: Account, id: string) {
-    const authGoogle = new google.auth.OAuth2(
-      account.clientId,
-      account.clientSecret,
-      account.redirectUri
-    );
-    authGoogle.setCredentials({ refresh_token: account.refrestToken });
-    this.drive = google.drive({
-      version: "v3",
-      auth: authGoogle,
-    });
+    this.setAccountCredentials(account);
     await this.drive.files.delete({ fileId: id });
   }
 
@@ -168,6 +189,7 @@ export class GoogleDriveManager {
             await this.uploadFileToGoogleDrive(currentActions[0].file);
             break;
           case config.googleDriveActionTypes.deleteAccount:
+            await this.deleteFilesFromAccount(currentActions[0].email)
             break;
           case config.googleDriveActionTypes.deleteFile:
             const fileService = new FileService();
@@ -205,18 +227,33 @@ export class GoogleDriveManager {
         googleDriveAction,
         googleDrivefile
       );
-      await this.sendFilesToDownloader(googleDrivefile,'update file',googleDriveAction.newFileName );
+      await this.sendFilesToDownloader(
+        googleDrivefile,
+        "update file",
+        googleDriveAction.newFileName
+      );
       console.log("done on " + this.accounts[index].email);
     }
-    await googleDriveFileRepositoryImplementation.updateFile(googleDriveAction.file.filename, googleDriveAction.newFileName );
-    await this.gridFsManager.updateFileName(googleDriveAction.file.filename, googleDriveAction.newFileName );
+    await googleDriveFileRepositoryImplementation.updateFile(
+      googleDriveAction.file.filename,
+      googleDriveAction.newFileName
+    );
+    await this.gridFsManager.updateFileName(
+      googleDriveAction.file.filename,
+      googleDriveAction.newFileName
+    );
   }
 
   async updateFileNameOnGoogleDriveAccount(
     googleDriveAction: GoogleDriveAction,
     googleDrivefile: GoogleDriveFile
   ) {
-    console.log("updating to  ",googleDrivefile.fileId, " ", googleDriveAction.newFileName )
+    console.log(
+      "updating to  ",
+      googleDrivefile.fileId,
+      " ",
+      googleDriveAction.newFileName
+    );
     await this.drive.files.update({
       fileId: googleDrivefile.fileId,
       resource: { name: googleDriveAction.newFileName },

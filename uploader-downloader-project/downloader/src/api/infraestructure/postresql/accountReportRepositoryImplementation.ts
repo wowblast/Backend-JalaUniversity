@@ -24,6 +24,9 @@ export class AccountReportRepositoryImplementation implements AccountReportRepos
         }
         await this.repository.delete(id);
     }
+    async deleteSAccountReportByEmail(email: string) {
+        await this.repository.delete({email});
+    }
     async getAccountReportByDateAndEmail(date: string, email: string): Promise<AccountReport> {
         if (!SingletonAppDataSource.getInstance().getAppDataSource().isInitialized ) {
             await SingletonAppDataSource.getInstance().intiazilateAppDataSource()

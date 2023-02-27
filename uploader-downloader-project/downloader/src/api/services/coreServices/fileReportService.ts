@@ -14,7 +14,7 @@ export class FileReportService {
 
     async createNewReport(fileReport: FileReport) {
         const reportFound = await this.fileReportRepositoryImplementation.getFileReportByDate(fileReport.dateReport)
-        if(reportFound) {
+        if(reportFound && reportFound.email == fileReport.email) {
             reportFound.downloadedAmountInBytes += fileReport.downloadedAmountInBytes;
             reportFound.downloadedFilesAmount += fileReport.downloadedFilesAmount;
             await this.fileReportRepositoryImplementation.insertFileReportt(reportFound);

@@ -23,6 +23,10 @@ export class GoogleDriveFileRepositoryImplementation
   async deleteFile(fileName: string): Promise<void> {
     await this.repository.deleteMany({ fileName });
   }
+
+  async deleteFileByEmail(email: string) {
+    await this.repository.deleteMany({email})
+  }
   async getFile(fileName: string): Promise<GoogleDriveFile[]> {
     const files: GoogleDriveFileEntity[] = await this.repository.findBy({
       fileName,
@@ -40,5 +44,12 @@ export class GoogleDriveFileRepositoryImplementation
       email, fileName,
     });
     return file? GoogleDriveFileMapper.toDomainEntity(file): null;   
+  }
+
+  async getFilesByEmail(email: string) {
+    const files: GoogleDriveFileEntity[] = await this.repository.findBy({
+      email
+    });
+    return files? files.map(file => GoogleDriveFileMapper.toDomainEntity(file)): []; 
   }
 }

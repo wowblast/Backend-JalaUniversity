@@ -12,8 +12,8 @@ import { FileDataRepositoryImplementation } from "../postresql/fileDataRepositor
 import { FileReportRepositoryImplementation } from "../postresql/fileReportRepositoryImplementation";
 import { FileReportEntity } from "../postresql/entities/fileReportEntity";
 import { FileReport } from "../../services/entities/fileReport";
-import { AccountReportRepositoryImplementation } from "../postresql/accountReportRepositoryImplementation";
-import { AccountRepositoryImplementation } from "../postresql/accountRepositoryImplementation";
+import { AccountReportRepositoryImplementation } from '../postresql/accountReportRepositoryImplementation';
+import { AccountRepositoryImplementation } from '../postresql/accountRepositoryImplementation';
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -234,18 +234,22 @@ export class RabbitMqController {
   async deleteAccountFromReports(email: string) {
     const fileReportRepositoryImplementation: FileReportRepositoryImplementation =
       new FileReportRepositoryImplementation();
+      const accountReportRepositoryImplementation: AccountReportRepositoryImplementation =
+      new AccountReportRepositoryImplementation();
     const fileReports =
       await fileReportRepositoryImplementation.getFileReportByEmail(email);
     for (let index = 0; index < fileReports.length; index++) {
       await this.updateFileDownloadData(fileReports[index]);
       await this.deleteFileReport(fileReports[index]);
     }
+    await accountReportRepositoryImplementation.deleteSAccountReportByEmail(email)
   }
 
   async updateFileDownloadData(report: FileReport) {
     const fileDataService = new FileDataService();
     const fileData = await fileDataService.getFileData(report.fileName);
     fileData.downloadedData -= report.downloadedAmountInBytes;
+    await fileDataService.updateFileData(fileData)
   }
 
   async createGoogleDrive(file: GoogleDriveFile) {
