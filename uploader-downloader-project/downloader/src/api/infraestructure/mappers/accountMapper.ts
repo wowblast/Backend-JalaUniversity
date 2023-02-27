@@ -7,6 +7,7 @@ export class AccountMapper {
     account.id = accountEntity.id;
     account.email = accountEntity.email;
     account.downloadedData = accountEntity.downloadedData;
+    account.timesDownloaded = accountEntity.timesDownloaded;
     return account;
   }
 
@@ -15,6 +16,7 @@ export class AccountMapper {
     accountEntity.id = account.id;
     accountEntity.email = account.email;
     accountEntity.downloadedData = account.downloadedData;
+    accountEntity.timesDownloaded = account.timesDownloaded;
     return accountEntity;
   }
 }

@@ -14,6 +14,7 @@ import { FileReportEntity } from "../postresql/entities/fileReportEntity";
 import { FileReport } from "../../services/entities/fileReport";
 import { AccountReportRepositoryImplementation } from '../postresql/accountReportRepositoryImplementation';
 import { AccountRepositoryImplementation } from '../postresql/accountRepositoryImplementation';
+import logger from 'jet-logger';
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -34,20 +35,20 @@ export class RabbitMqController {
         "Error: Instantiation failed: Use RabbitMqController.getInstance() instead of new."
       );
     }
-    //this.initializateRabbitMQ()
     RabbitMqController._instance = this;
   }
 
   public async initializateRabbitMQ() {
     if (!this.connection) {
       this.connection = await client.connect(
-        "amqp://guest:guest@localhost:5672"
+        config.rabbitMqUrl
       );
       this.consumer =
         (channel: Channel) =>
         async (msg: ConsumeMessage | null): Promise<void> => {
           if (msg) {
-            console.log("downloadchannel", msg.content.toString());
+            logger.info("downloadchannel")
+            logger.imp(msg.content.toString())
             this.messages.push(msg.content.toString());
             this.manageMessages();
             channel.ack(msg);
@@ -58,7 +59,7 @@ export class RabbitMqController {
       await this.createChannel(this.downloadChannel);
       await this.createChannel(this.statisticsChannel);
       await this.startToReceiveMessages();
-      console.log("init");
+      logger.imp("init rabbit mq");
     }
   }
 
@@ -71,12 +72,9 @@ export class RabbitMqController {
   }
 
   public async sendMessage(message: string) {
-    console.log("sent message tpe ", typeof message, message);
-
     try {
       this.channel.sendToQueue(this.statisticsChannel, Buffer.from(message));
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -93,7 +91,8 @@ export class RabbitMqController {
       this.isMessagesManagerReady = false;
       while (true) {
         let currentMesages = this.messages;
-        console.log("messages remainign", currentMesages);
+        logger.info("messages remainign")
+        logger.imp(currentMesages)
         const message: MessageData = JSON.parse(currentMesages[0]);
         switch (message.method) {
           case "create":
@@ -141,7 +140,6 @@ export class RabbitMqController {
             break;
         }
         this.messages.shift();
-        console.log(this.messages);
         if (this.messages.length == 0) {
           break;
         }
@@ -263,6 +261,7 @@ export class RabbitMqController {
     const newAccount = new Account();
     newAccount.email = email;
     newAccount.downloadedData = 0;
+    newAccount.timesDownloaded = 0;
     await accountService.insertAccountIfNewAccount(newAccount);
   }
 

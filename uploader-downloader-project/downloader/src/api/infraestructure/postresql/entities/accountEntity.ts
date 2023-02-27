@@ -10,4 +10,7 @@ export class AccountEntity {
 
     @Column()
     downloadedData: number
+    
+    @Column()
+    timesDownloaded: number;
 }

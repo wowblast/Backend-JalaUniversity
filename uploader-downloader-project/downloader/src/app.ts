@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import logger from 'jet-logger';
 
 import app from "./Api/";
 import { SingletonAppDataSource } from "./api/infraestructure/postresql/datasource";
@@ -10,6 +11,5 @@ app.listen(port, async () => {
   await dataSource.intiazilateAppDataSource();
   await RabbitMqController.getInstance().initializateRabbitMQ();
 
-
-  console.log(`Downloader service is running on port ${port}.`);
+  logger.imp(`Downloader service is running on port ${port}.`)
 });

@@ -12,13 +12,24 @@ export class GoogleDriveFileService {
     const accountRepositoryImplementation: AccountRepositoryImplementation =
       new AccountRepositoryImplementation();
     const fileDataService: FileDataService = new FileDataService();
-    const leastUsedAccount: Account =
-      await accountRepositoryImplementation.getLeastUsedAccount();
+    const leastUsedAccounts: Account[] =
+      await accountRepositoryImplementation.getLeastUsedAccounts();
+    const averageDownloads = await accountRepositoryImplementation.getTimesDownloadedAverage();
+    let leastUsedAccount: Account;
+    for (let index = 0; index < leastUsedAccounts.length; index++) {
+      if(leastUsedAccounts[index].timesDownloaded <= averageDownloads) {
+        leastUsedAccount = leastUsedAccounts[index];
+        break;
+      }
+    }
     const file: GoogleDriveFile =
       await googleDriveRepositoryImplementation.getFileByEmailAndFileName(
         leastUsedAccount.email,
         fileName
       );
+    if(!file) {
+      throw new Error('file not found')
+    }
     const fileData: FileData = await fileDataService.getFileData(file.fileName);
     await this.updateAccountUsage(leastUsedAccount, file);
     await this.updateFileDownloadAmount(fileData, file);
@@ -40,6 +51,7 @@ export class GoogleDriveFileService {
 
   async updateAccountUsage(leastUsedAccount: Account, file: GoogleDriveFile) {
     leastUsedAccount.downloadedData += file.fileSize;
+    leastUsedAccount.timesDownloaded += 1;
     const accountRepositoryImplementation: AccountRepositoryImplementation =
       new AccountRepositoryImplementation();
     await accountRepositoryImplementation.updateAccount(leastUsedAccount);

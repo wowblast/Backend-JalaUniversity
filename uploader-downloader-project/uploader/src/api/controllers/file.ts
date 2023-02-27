@@ -14,8 +14,8 @@ export const uploadFile = async (req, res, next): Promise<void> => {
       await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createFileData)
       res.status(HttpStatusCode.CREATED).json({
         statusCode: HttpStatusCode.CREATED,
-        message: 'File Uploaded',
-        fileStatus: 'Pending'
+        message: config.httpBasicResponses.fileUploaded,
+        fileStatus: config.fileStatus.replicatingState
       });
 
     } else {
@@ -27,13 +27,12 @@ export const uploadFile = async (req, res, next): Promise<void> => {
 };
 
 export const getFile = async (req, res, next): Promise<void> => {
-  console.log("getting file")
   try {
     const fileService = new FileService()
     const [fileFound, googleDriveFiles] = await fileService.getFile(req.body.filename);
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
-      message: 'File Data',
+      message: config.httpBasicResponses.fileDataResult,
       file: fileFound,
       googleDriveFiles: googleDriveFiles
     });
@@ -42,8 +41,22 @@ export const getFile = async (req, res, next): Promise<void> => {
   }
 };
 
+export const getAllFiles= async (req, res, next): Promise<void> => {
+  try {
+    const fileService = new FileService()
+    const fileFound = await fileService.getAllFiles();
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: config.httpBasicResponses.fileDataResult,
+      files: fileFound,
+    
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const deleteFile = async (req, res, next): Promise<void> => {
-  console.log("deleting file")
   try {
     const gridFsManager = GridFsManager.getInstance();
 
@@ -57,7 +70,7 @@ export const deleteFile = async (req, res, next): Promise<void> => {
       await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.deleteFile)
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
-      message: 'File deletion in progress'
+      message: config.httpBasicResponses.fileDeleteInProgress
     });
   } catch (err) {
     next(err);
@@ -71,7 +84,7 @@ export const updateFile = async (req, res, next): Promise<void> => {
    
     res.status(HttpStatusCode.OK).json({
       statusCode: HttpStatusCode.OK,
-      message: 'File name update in progress if exist'
+      message: config.httpBasicResponses.fileUpdateInProgress
     });
   } catch (err) {
     next(err);

@@ -4,15 +4,17 @@ import { GoogleDriveFileEntity } from "./entities/googleDriveFileEntity";
 import { FileReportEntity } from "./entities/fileReportEntity";
 import { AccountReportEntity } from "./entities/accountReportEntity";
 import { FileDataEntity } from "./entities/fileDataEntity";
+import { config } from "../../../../config";
+import logger from 'jet-logger';
 
 export class SingletonAppDataSource {
   private AppDataSource = new DataSource({
-    type: "postgres",
-    host: "localhost",
-    port: 5432,
-    database: "downloader",
-    username: "postgres",
-    password: "Welcome4$",
+    type: config.dataBaseConfig.databaseType as any,
+    host: config.dataBaseConfig.host,
+    port: parseInt(config.dataBaseConfig.port),
+    database: config.dataBaseConfig.dataBaseName,
+    username: config.dataBaseConfig.userName,
+    password: config.dataBaseConfig.password,
     synchronize: true,
     logging: false,
     entities: [
@@ -34,7 +36,6 @@ export class SingletonAppDataSource {
     if (!SingletonAppDataSource.instance) {
       SingletonAppDataSource.instance = new SingletonAppDataSource();
     }
-
     return SingletonAppDataSource.instance;
   }
 
@@ -44,6 +45,6 @@ export class SingletonAppDataSource {
 
   public async intiazilateAppDataSource() {
     await this.AppDataSource.initialize();
-    console.log("datasource ready");
+    logger.imp("datasource ready");
   }
 }

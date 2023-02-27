@@ -41,8 +41,6 @@ export class GoogleDriveRepositoryImplementation
   }
 
   async getFiles() {
-    console.log("is init ", SingletonAppDataSource.getInstance().getAppDataSource().isInitialized)
-
     return await this.repository.find()
   }
 

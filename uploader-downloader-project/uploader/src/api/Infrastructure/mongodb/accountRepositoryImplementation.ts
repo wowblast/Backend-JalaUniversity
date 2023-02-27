@@ -27,7 +27,7 @@ export class AccountRepositoryImplementation implements AccountRepository {
     const accountFound: AccountEntity = await this.repository.findOneBy({
       email,
     });
-    return AccountMapper.toDomainEntity(accountFound);
+    return accountFound? AccountMapper.toDomainEntity(accountFound): null;
   }
 
   async getAllAccounts(): Promise<Account[]> {

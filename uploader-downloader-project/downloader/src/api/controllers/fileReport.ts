@@ -1,9 +1,10 @@
 import { FileReportService } from "../services/coreServices/fileReportService";
 import { FileReport } from "../services/entities/fileReport";
-import { FileDataService } from '../services/coreServices/fileDataService';
+import { FileDataService } from "../services/coreServices/fileDataService";
 import { InfluxDbController } from "../influxDBController/influxDBcontroller";
 import { config } from "../../../config";
-export const getFileReports = async (req, res): Promise<void> => {
+import { HttpStatusCode } from "../errorHandling/errorHandler";
+export const getFileReports = async (req, res, next): Promise<void> => {
   try {
     const fileReport = new FileReportService();
     const fileDataService = new FileDataService();
@@ -11,26 +12,30 @@ export const getFileReports = async (req, res): Promise<void> => {
       req.body.fileName
     );
     const fileData = await fileDataService.getFileData(req.body.fileName);
-    console.log("filedata", fileData)
-    if(fileData) {
-      InfluxDbController.getInstance().initInfluxDB()
-      await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.getFileReport);
-      res.json({
-        status: "200",
+    if (fileData) {
+      InfluxDbController.getInstance().initInfluxDB();
+      await InfluxDbController.getInstance().saveActionStatus(
+        config.actionTypes.getFileReport
+      );
+      res.status(HttpStatusCode.OK).json({
+        statusCode: HttpStatusCode.OK,
+        message: config.httpBasicResponses.fileReportFound,
         fileName: fileData.fileName,
-        totalDownloaded:  fileData.downloadedData,
+        totalDownloaded: fileData.downloadedData,
         report: reportsFounded,
       });
-
     } else {
-      res.json({status:'202', message: 'file not found'});
+      res.status(HttpStatusCode.NOT_FOUND).json({
+        statusCode: HttpStatusCode.NOT_FOUND,
+        message: config.httpBasicResponses.fileReportNotFound,
+      });
     }
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };
 
-export const createFiletReport = async (req, res): Promise<void> => {
+export const createFiletReport = async (req, res, next): Promise<void> => {
   try {
     const fileReportService = new FileReportService();
     const fileReport: FileReport = new FileReport();
@@ -39,12 +44,16 @@ export const createFiletReport = async (req, res): Promise<void> => {
     fileReport.downloadedAmountInBytes = req.body.downloadedAmountInBytes;
     fileReport.downloadedFilesAmount = req.body.downloadedFilesAmount;
     fileReport.email = req.body.email;
-    console.log("creatin file report", fileReport)
     await fileReportService.createNewReport(fileReport);
-    InfluxDbController.getInstance().initInfluxDB()
-    await InfluxDbController.getInstance().saveActionStatus(config.actionTypes.createAccountReport);
-    res.json({ status: "200", message: "reportCreated" });
+    InfluxDbController.getInstance().initInfluxDB();
+    await InfluxDbController.getInstance().saveActionStatus(
+      config.actionTypes.createAccountReport
+    );
+    res.status(HttpStatusCode.OK).json({
+      statusCode: HttpStatusCode.OK,
+      message: config.httpBasicResponses.fileReportCreated,
+    });
   } catch (err) {
-    res.status(500).send(err);
+    next(err);
   }
 };

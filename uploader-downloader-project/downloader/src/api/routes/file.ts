@@ -1,13 +1,12 @@
 import { Router } from 'express';
 import { downloadFile, listFiles } from '../controllers/file';
+import ErrorHandlerMiddleware from '../middlewares/errorHandlerMiddleware';
+import verifyFilenameData from '../middlewares/verifyFilenameData';
 const routes = Router();
 
-//routes.get('/file/:id', downloadFile);
 routes.get('/', listFiles);
-routes.get('/download', downloadFile);
+routes.get('/download',verifyFilenameData, downloadFile);
+routes.use(ErrorHandlerMiddleware);
 
-
-//routes.post('/file', createBoard);
-//routes.delete('/file', clearBoard);
 
 export default routes;

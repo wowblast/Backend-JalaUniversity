@@ -1,4 +1,4 @@
-import logger from 'jet-logger';
+import logger from "jet-logger";
 
 export enum HttpStatusCode {
   OK = 200,
@@ -16,8 +16,8 @@ export class ErrorHandler {
     this.errorReceived = errorReceived;
   }
 
-    createErrorResponse() {
-    logger.warn("error to handle")
+  createErrorResponse() {
+    logger.warn("error to handle");
     logger.warn("message");
     logger.warn(this.errorReceived.message);
     logger.warn("cause");
@@ -36,15 +36,15 @@ export class ErrorHandler {
         break;
       case "EntityNotFoundError":
         this.errorData = {
-            statusCode: HttpStatusCode.NOT_FOUND,
-            message: "RESOURCE NOT FOUND",
-          };
+          statusCode: HttpStatusCode.NOT_FOUND,
+          message: "RESOURCE NOT FOUND",
+        };
         break;
       case "TypeError":
         this.errorData = {
-            statusCode: HttpStatusCode.NOT_FOUND,
-            message: "RESOURCE NOT FOUND",
-          };
+          statusCode: HttpStatusCode.NOT_FOUND,
+          message: "RESOURCE NOT FOUND",
+        };
         break;
       default:
         this.errorData = {
@@ -53,6 +53,6 @@ export class ErrorHandler {
         };
         break;
     }
-    return this.errorData
+    return this.errorData;
   }
 }

@@ -1,4 +1,6 @@
 import client, { Channel, Connection, ConsumeMessage } from "amqplib";
+import { config } from "../../../../config";
+import logger from "jet-logger";
 
 export class RabbitMqController {
   private static _instance: RabbitMqController = new RabbitMqController();
@@ -20,26 +22,22 @@ export class RabbitMqController {
         "Error: Instantiation failed: Use RabbitMqController.getInstance() instead of new."
       );
     }
-    //this.initializateRabbitMQ()
     RabbitMqController._instance = this;
   }
 
   public async initializateRabbitMQ() {
     if (!this.connection) {
-      this.connection = await client.connect(
-        "amqp://guest:guest@localhost:5672"
-      );
+      this.connection = await client.connect(config.rabbitMqUrl);
       this.consumer =
         (channel: Channel) =>
         async (msg: ConsumeMessage | null): Promise<void> => {
           if (msg) {
             this.messages.push(msg.content.toString());
-            //console.log(this.messages)
             channel.ack(msg);
             this.uploadFiles();
           }
         };
-      console.log("init");
+      logger.info("init rabitmq");
       this.isuploaderReady = true;
       await this.initializateChannel();
       await this.createChannel(this.uploadChannel);
@@ -59,11 +57,7 @@ export class RabbitMqController {
   }
 
   public async sendMessage(message: string) {
-    console.log("mesage sent: ", message);
-
-    //this.channel.sendToQueue(this.uploadChannel, Buffer.from(message))
     this.channel.sendToQueue(this.downloadChannel, Buffer.from(message));
-    //this.channel.sendToQueue(this.statisticsChannel, Buffer.from("hola statiscits"))
   }
 
   public async startToReceiveMessages() {
@@ -71,9 +65,6 @@ export class RabbitMqController {
       this.uploadChannel,
       this.consumer(this.channel)
     );
-    if (!this.isuploaderReady) {
-      //await this.stopToRceiveMessages()
-    }
   }
 
   public async uploadFiles() {
@@ -83,9 +74,7 @@ export class RabbitMqController {
       while (true) {
         await sleep(5000);
         let currentMesages = this.messages;
-        console.log("done ", currentMesages[0]);
         this.messages.shift();
-        console.log(this.messages);
         if (this.messages.length == 0) {
           break;
         }

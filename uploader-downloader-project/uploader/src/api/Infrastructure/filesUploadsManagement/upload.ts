@@ -7,8 +7,6 @@ let storage = multer.diskStorage({
     cb(null,  './src/api/files');
   },
   filename: (req, file, cb) => {
-    console.log("test")
-    console.log(file.originalname);
     cb(null, file.originalname);
   },
 });

@@ -4,6 +4,7 @@ import { SingletonAppDataSource } from "./api/Infrastructure/mongodb/datasource"
 import { GridFsManager } from "./api/Infrastructure/mongodb/gridFsManager";
 import { RabbitMqController } from "./api/Infrastructure/rabbitmq/rabbitMQcontroller";
 const port = "3001";
+import logger from 'jet-logger';
 
 
 app.listen(port, async () => {
@@ -15,5 +16,5 @@ app.listen(port, async () => {
   await rabbitController.initializateRabbitMQ();
   const googleDrive = GoogleDriveManager.getInstance();
   await googleDrive.initializeGoogleDriveManager();
-  console.log(`Uploader service is running on port ${port}.`);
+  logger.info(`Uploader service is running on port ${port}.`)
 });

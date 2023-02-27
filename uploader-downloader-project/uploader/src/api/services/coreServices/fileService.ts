@@ -7,6 +7,7 @@ import { GoogleDriveManager } from "../../Infrastructure/googledrive/googledrive
 import { RabbitMqController } from "../../Infrastructure/rabbitmq/rabbitMQcontroller";
 import { GoogleDriveAction } from "../../Infrastructure/googledrive/googleDriveAction";
 import { config } from "../../../../config";
+import logger from "jet-logger";
 
 export class FileService {
   async uploadFile(filename: string) {
@@ -18,14 +19,18 @@ export class FileService {
   async uploadFilesFromLocal(fileData: File) {
     const gridFsManager = GridFsManager.getInstance();
     const googleDriveManager = GoogleDriveManager.getInstance();
-    console.log("START UPLOADING...");
+    logger.info("START UPLOADING...");
     const googleDriveAction: GoogleDriveAction = {
       method: config.googleDriveActionTypes.createFile,
       file: fileData,
     };
     await googleDriveManager.manageGoogleDriveService(googleDriveAction);
-    console.log("ENDING UPLOADING... UPDATING STATUS");
-    await gridFsManager.updateFileStatus(fileData.filename, statusTypes.ready);
+    
+  }
+  async getAllFiles() {
+    const gridFsManager = GridFsManager.getInstance();
+    const files = await gridFsManager.getAllFiles();
+    return files;
   }
 
   async getFile(filename: string): Promise<[File, GoogleDriveFile[]]> {
@@ -68,7 +73,10 @@ export class FileService {
     );
     await googleDriveFileRepositoryImplementation.deleteFile(fileName);
     await gridFsManager.deleteFile(fileName);
-    await this.sendFilesToDownloader("delete", googleDriveFiles[0]);
+    await this.sendFilesToDownloader(
+      config.rabbiMqMessages.deleteFile,
+      googleDriveFiles[0]
+    );
   }
 
   async sendFilesToDownloader(
@@ -76,7 +84,6 @@ export class FileService {
     googleDriveFile: GoogleDriveFile
   ) {
     if (googleDriveFile) {
-      console.log("message");
       const message = {
         method: method,
         file: googleDriveFile,

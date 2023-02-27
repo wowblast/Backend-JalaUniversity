@@ -7,13 +7,11 @@ import { MongoClient, GridFSBucket, ObjectId } from "mongodb";
 import fs from "fs";
 import { File } from "../../services/entities/file";
 import { FileMapper } from "../mappers/fileMapper";
-import { GoogleDriveManager } from "../googledrive/googledriveManager";
-import { statusTypes } from "../../types/statusTypes";
 import { SingletonAppDataSource } from "./datasource";
+import { config } from "../../../../config";
 
 export class GridFsManager {
   private bucket: GridFSBucket;
-  private gfs;
   private mongouri;
   private static _instance: GridFsManager = new GridFsManager();
   private client;
@@ -34,7 +32,7 @@ export class GridFsManager {
   async initializeMongoDB() {
     this.dataSourse = SingletonAppDataSource.getInstance();
 
-    this.mongouri = "mongodb://localhost:27017";
+    this.mongouri = config.gridFsConfig.mongoUri;
     this.repository = this.dataSourse.getAppDataSource().getMongoRepository(FileData);
     this.chunksRepository = this.dataSourse.getAppDataSource().getMongoRepository(FileChunk);
 
@@ -44,9 +42,8 @@ export class GridFsManager {
     this.client = new MongoClient(this.mongouri);
     await new Promise((resolve, reject) => {
       this.client.connect((err) => {
-        console.log("MongoDB connected");
-        const mongodb = this.client.db("uploader");
-        this.bucket = new GridFSBucket(mongodb, { bucketName: "uploads" });
+        const mongodb = this.client.db(config.gridFsConfig.mongoDataBaseName);
+        this.bucket = new GridFSBucket(mongodb, { bucketName: config.gridFsConfig.mongoBucketName });
         resolve(1);
       });
     });
@@ -55,7 +52,6 @@ export class GridFsManager {
   async closeMongoDBconnection() {
     await new Promise((resolve, reject) => {
       this.client.close((err) => {
-        console.log("MongoDB closed");       
         resolve(1);
       });
     });
@@ -84,11 +80,10 @@ export class GridFsManager {
         .openDownloadStream(new ObjectId(fileFound._id))
         .pipe(
           fs.createWriteStream(
-            "./src/api/Infrastructure/mongodb/outtest/" + fileFound.filename
+            config.tempFolderDir + fileFound.filename
           )
         )
         .on("error", function (error) {
-          console.log("error", error);
           reject(error);
         })
         .on("finish", async function () {
@@ -105,7 +100,6 @@ export class GridFsManager {
     await this.chunksRepository.deleteMany({
       files_id: fielFounded?._id || '',
     });
-    console.log("delted file", fielFounded);
     await this.repository.deleteOne(fielFounded);
     return fielFounded;
   }
@@ -126,16 +120,15 @@ export class GridFsManager {
   }
 }
 const storage = new GridFsStorage({
-  url: "mongodb://127.0.0.1:27017/uploader",
+  url: config.gridFsConfig.mongoStorageUrl,
   file: (req, file) => {
     file.fileName=  new Date().getTime() + file.originalname
     return new Promise((resolve, reject) => {
       const filename = file.fileName;
       const fileInfo = {
         filename,
-        bucketName: "uploads",
+        bucketName: config.gridFsConfig.mongoBucketName,
       };
-      console.log("subido", fileInfo);
       resolve(fileInfo);
     });
   },
