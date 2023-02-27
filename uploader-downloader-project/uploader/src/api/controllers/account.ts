@@ -32,8 +32,6 @@ export const removeAccount = async (req, res, next): Promise<void> => {
   try {
     const accountService = new AccountService();
     const account = await accountService.getAccount(req.body.email);
-    console.log("email to remove", account);
-
     if (account) {
       await accountService.deleteAccount(req.body.email);
       InfluxDbController.getInstance().initInfluxDB();

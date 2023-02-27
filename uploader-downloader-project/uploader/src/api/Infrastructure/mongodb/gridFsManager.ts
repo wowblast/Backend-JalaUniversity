@@ -68,6 +68,11 @@ export class GridFsManager {
     return fileFound ? FileMapper.toDomainEntity(fileFound) : null;
   }
 
+  async getAllFiles() {
+    const filesFound: FileData[] = await this.repository.find()
+    return filesFound ? filesFound.map(fileFound => FileMapper.toDomainEntity(fileFound)): [];
+  }
+
   async downloadFileFromGridFsToTempFolder(filename: string) {
     const fileFound: FileData = await this.repository.findOneBy({
       filename,

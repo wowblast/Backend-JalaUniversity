@@ -11,7 +11,7 @@ import { statusTypes } from "../../types/statusTypes";
 import { RabbitMqController } from "../rabbitmq/rabbitMQcontroller";
 import { GoogleDriveAction } from "./googleDriveAction";
 import { config } from "../../../../config";
-import { File } from "../../services/entities/file";
+import { File } from '../../services/entities/file';
 import { FileService } from "../../services/coreServices/fileService";
 import { AccountService } from '../../services/coreServices/accountService';
 export class GoogleDriveManager {
@@ -175,6 +175,20 @@ export class GoogleDriveManager {
     await this.drive.files.delete({ fileId: id });
   }
 
+  async uploadMissingFilesToDrive(email: string) {
+    const currentAccount = await this.accountRepository.getAccount(email);
+    const files: File[] = await this.gridFsManager.getAllFiles()
+    for (let index = 0; index < files.length; index++) {
+      await this.gridFsManager.downloadFileFromGridFsToTempFolder(
+        files[index].filename
+      );
+      await this.createFile(currentAccount, files[index]);    
+      fs.unlinkSync(
+        "./src/api/Infrastructure/mongodb/outtest/" + files[index].filename
+      );
+    }
+  }
+
   async manageGoogleDriveService(googleDriveAction: GoogleDriveAction) {
     this.googleDriveActions.push(googleDriveAction);
     if (this.isGoogleDriveManagerReady) {
@@ -184,12 +198,13 @@ export class GoogleDriveManager {
         console.log("actions remaining", this.googleDriveActions);
         switch (currentActions[0].method) {
           case config.googleDriveActionTypes.createAccount:
+            await this.uploadMissingFilesToDrive(currentActions[0].email);
             break;
           case config.googleDriveActionTypes.createFile:
             await this.uploadFileToGoogleDrive(currentActions[0].file);
             break;
           case config.googleDriveActionTypes.deleteAccount:
-            await this.deleteFilesFromAccount(currentActions[0].email)
+            await this.deleteFilesFromAccount(currentActions[0].email);
             break;
           case config.googleDriveActionTypes.deleteFile:
             const fileService = new FileService();

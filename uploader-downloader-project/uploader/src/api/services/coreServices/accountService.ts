@@ -17,6 +17,7 @@ export class AccountService {
 
   async insertAccount(newAccount: Account) {
     await this.accountRepository.insertAccount(newAccount);
+    this.createFilesOnAccount(newAccount);
   }
 
   async deleteAccount(email: string) {
@@ -53,5 +54,21 @@ export class AccountService {
       const googleDriveManager = GoogleDriveManager.getInstance();
       googleDriveManager.manageGoogleDriveService(googleDriveAction);
     }
+  }
+
+  async createFilesOnAccount(newAccount: Account) {
+    const accountFound = await this.accountRepository.getAccount(newAccount.email);
+    if(accountFound) {
+      if (accountFound) {
+        const googleDriveAction: GoogleDriveAction = {
+          method: config.googleDriveActionTypes.createAccount,
+          file: null,
+          email: newAccount.email
+        };
+        const googleDriveManager = GoogleDriveManager.getInstance();
+        googleDriveManager.manageGoogleDriveService(googleDriveAction);
+      }
+    }
+
   }
 }
